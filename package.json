@@ -1,0 +1,24 @@
+{
+  "name": "lms_backend",
+  "version": "1.0.0",
+  "description": "The project belongs to the learing management system in which student of the department of computer science can benefit online classes due to COVID-19",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/misbahkhalilaz/LMS_Backend.git"
+  },
+  "keywords": [
+    "Learning",
+    "Online",
+    "Classes"
+  ],
+  "author": "misbah & ata",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/misbahkhalilaz/LMS_Backend/issues"
+  },
+  "homepage": "https://github.com/misbahkhalilaz/LMS_Backend#readme"
+}
