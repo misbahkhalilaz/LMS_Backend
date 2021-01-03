@@ -4,7 +4,7 @@
   "description": "The project belongs to the learing management system in which student of the department of computer science can benefit online classes due to COVID-19",
   "main": "server.js",
   "scripts": {
-    "test": "npm start"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/misbahkhalilaz/LMS_Backend/issues"
   },
-  "homepage": "https://github.com/misbahkhalilaz/LMS_Backend#readme"
+  "homepage": "https://github.com/misbahkhalilaz/LMS_Backend#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
