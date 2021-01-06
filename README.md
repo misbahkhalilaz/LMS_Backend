@@ -1,4 +1,4 @@
-Technollogies: 
+Technologies: 
 
 Express  
 Sequelize  
