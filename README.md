@@ -1,8 +1,8 @@
 Technologies: 
 
 Express  
-Sequelize  
+Sequelize ORM  
 CRON  
 Socket.io  
-MySQL  
+Postgree  
 MongoDB
