@@ -4,7 +4,8 @@
   "description": "The project belongs to the learing management system in which student of the department of computer science can benefit online classes due to COVID-19",
   "main": "server.ts",
   "scripts": {
-    "start": "nodemon src/server.ts"
+    "start": "node src/server.ts",
+    "start-dev": "nodemon src/server.ts"
   },
   "repository": {
     "type": "git",
