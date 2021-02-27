@@ -14,6 +14,8 @@ class Server {
     this.config();
   }
 
+  // testing github username only
+
   private config(): void {
     this.app.set('port', process.env.PORT || 3000);
     this.app.use(bodyParser.json());
