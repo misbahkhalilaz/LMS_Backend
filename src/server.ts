@@ -9,9 +9,9 @@ class Server {
   public app: express.Application;
 
   constructor() {
-    dotenv.config();  //this must be called before any other func, otherwise this.config() will not get process.env.PORT
     this.app = express();
     this.config();
+    dotenv.config();
   }
 
   private config(): void {
@@ -24,7 +24,6 @@ class Server {
   public start(): void {
     this.app.listen(this.app.get('port'), () => {
       console.log(`Server is listening at port ${this.app.get('port')}`)
-      console.log(process.env.PORT);
     })
   }
 
