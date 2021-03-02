@@ -2,9 +2,10 @@ import express from "express";
 import cors from 'cors';
 import * as bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
-
+import router from "./routes";
 // test prisma ///////////////////////////////////////
 import { PrismaClient } from '@prisma/client' // npm run prisma will generate schema according to connected db plus this client also created in node_modules to access db.
+
 const prisma = new PrismaClient() //db client instance
 
  async function test() {
@@ -32,6 +33,7 @@ class Server {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(cors());
+    this.app.use(router);
   }
 
   public start(): void {

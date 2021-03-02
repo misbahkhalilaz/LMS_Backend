@@ -7,7 +7,7 @@
     "start": "node build/server.js",
     "dev": "nodemon src/server.ts",
     "build": "tsc",
-    "prisma": "prisma introspect && prisma generate" 
+    "prisma": "prisma introspect && prisma generate"
   },
   "repository": {
     "type": "git",
