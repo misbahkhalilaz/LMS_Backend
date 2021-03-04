@@ -7,8 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model auth {
-  id      Int     @id
-  user_id String?
-  pass    String?
+model users {
+  id             Int      @id @default(autoincrement())
+  user_id        String   @unique @db.VarChar(12)
+  password       String   @db.VarChar(20)
+  role           String   @db.VarChar(10)
+  name           String   @db.VarChar(25)
+  phone_no       Decimal  @db.Decimal(11, 0)
+  email          String?  @db.VarChar(30)
+  admission_year Decimal? @db.Decimal(4, 0)
+  isActive       Boolean? @default(true)
 }
