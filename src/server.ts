@@ -4,18 +4,18 @@ import * as bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 import router from "./routes";
 // test prisma ///////////////////////////////////////
-import { PrismaClient } from '@prisma/client' // npm run prisma will generate schema according to connected db plus this client also created in node_modules to access db.
+// import { PrismaClient } from '@prisma/client' // npm run prisma will generate schema according to connected db plus this client also created in node_modules to access db.
 
-const prisma = new PrismaClient() //db client instance
+// const prisma = new PrismaClient() //db client instance
 
- async function test() {
-    const allUsers = await prisma.auth.findMany() //query
-    console.log(allUsers)
-  } 
+//  async function test() {
+//     const allUsers = await prisma.auth.findMany() //query
+//     console.log(allUsers)
+//   } 
 
-  test()
+//   test()
 
-///////////////////////////////////////////////
+// ///////////////////////////////////////////////
 
 
 class Server {
@@ -23,7 +23,7 @@ class Server {
   public app: express.Application;
 
   constructor() {
-    dotenv.config();  //this must be called before any other func, otherwise this.config() will not get process.env.PORT
+    dotenv.config();  
     this.app = express();
     this.config();
   }
@@ -37,10 +37,10 @@ class Server {
   }
 
   public start(): void {
-    this.app.get('/', (req, res) => prisma.auth.findMany().then(r => res.send(r))) // for hosting build test
+    // this.app.get('/', (req, res) => prisma.auth.findMany().then(r => res.send(r))) // for hosting build test
     this.app.listen(this.app.get('port'), () => {
       console.log(`Server is listening at port ${this.app.get('port')}`)
-      console.log(process.env.PORT);
+      // console.log(process.env.PORT);
     })
   }
 

@@ -1,6 +1,11 @@
 export default interface User {
-    name: string,
-    class: string,
-    age: string,
-    // you can put all fields here
+    id: number,            
+    user_id: string,       
+    password:string,
+    role:string,
+    name:string,  
+    phone_no: number,      
+    email: string,
+    admission_year: string,
+    isActive: boolean
 }

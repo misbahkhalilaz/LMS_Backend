@@ -5,8 +5,10 @@ import * as jwt from 'jsonwebtoken';
 class AuthController {
 
     private prisma: any;
+    private secret: any;
     
     constructor() {
+        this.secret = process.env.secret
         this.prisma = new PrismaClient();
     }
 
@@ -39,10 +41,11 @@ class AuthController {
 
     private generateToken = (user: any) => {
         const expiresIn = 60*60;
-        const secret = process.env.secret;
+        
+        
         return {
             expiresIn,
-            token: jwt.sign({id: user.id}, secret, { expiresIn }),
+            token: jwt.sign({id: user.id}, this.secret, { expiresIn }),
         }
     }
 
