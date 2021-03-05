@@ -1,6 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import * as express from 'express';
 import * as jwt from 'jsonwebtoken';
+import * as crypto from 'crypto';
+import User from './../interfaces/User';
+import TokenData from './../interfaces/TokenData';
 
 class AuthController {
 
@@ -14,13 +17,13 @@ class AuthController {
 
     public login = async (req: express.Request, res: express.Response) => {
         try {
-            const loginData = req.body;
+            const loginData: TokenData = req.body;
             const user = await this.prisma.user.findUnique({
                 where: {
-                    email:loginData?.email
+                    user_id:loginData?.userId
                 }
             })
-            if (user && user?.password === loginData.password) {
+            if (user?.password === loginData.password) {
                 const tokenData = this.generateToken(user);
                 res.status(200).send({
                     message: 'Login successfully',
@@ -28,8 +31,8 @@ class AuthController {
                 })
             } else {
                 res.status(401).send({
-                    accessToken: null,
-                    message: 'Invalid email or password'
+                    message: 'Invalid email or password',
+                    token: null
                 });
             }
         } catch (err) {
@@ -39,13 +42,31 @@ class AuthController {
         }
     }
 
-    private generateToken = (user: any) => {
-        const expiresIn = 60*60;
-        
+    public resetPassword = async (req: express.Request, res: express.Response) => {
+        try {
+            const userId = req?.body?.userId;
+            const user = await this.prisma.findUnique({
+                where: {
+                    user_id: userId
+                }
+            })
+            if (!user) res.status(404).send({
+              message: 'User not found'  
+            });
+            
+        } catch (err) {
+            res.status(500).send({
+                message: err
+            })
+        }
+    }
+
+    private generateToken = (user: User) => {
+        const expiresIn = 24*60*60;
         
         return {
             expiresIn,
-            token: jwt.sign({id: user.id}, this.secret, { expiresIn }),
+            token: jwt.sign({id: user.id, role: user.role}, this.secret, { expiresIn }),
         }
     }
 
