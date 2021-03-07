@@ -4,8 +4,8 @@ export default interface User {
     password:string,
     role:string,
     name:string,  
-    phone_no: number,      
+    phone_no: string,      
     email: string,
-    admission_year: string,
+    admission_year: number,
     isActive: boolean
 }

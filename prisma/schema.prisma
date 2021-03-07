@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["createMany"]
 }
 
 datasource db {
@@ -9,12 +10,12 @@ datasource db {
 
 model users {
   id             Int      @id @default(autoincrement())
-  user_id        String   @unique @db.VarChar(12)
-  password       String   @db.VarChar(20)
-  role           String   @db.VarChar(10)
-  name           String   @db.VarChar(25)
-  phone_no       Decimal  @db.Decimal(11, 0)
-  email          String?  @db.VarChar(30)
+  user_id        String   @unique @db.VarChar(50)
+  password       String?  @db.VarChar(20)
+  role           String   @default("student") @db.VarChar(10)
+  name           String   @db.VarChar(30)
+  phone_no       String   @db.VarChar(11)
+  email          String?  @db.VarChar(50)
   admission_year Decimal? @db.Decimal(4, 0)
-  isActive       Boolean? @default(true)
+  isActive       Boolean  @default(true)
 }
