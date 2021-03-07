@@ -9,7 +9,7 @@ class AuthController {
 
     private prisma: any = new PrismaClient();
     private secret: any;
-    
+
     constructor() {
         this.secret = process.env.secret
         this.prisma = new PrismaClient();
@@ -20,7 +20,7 @@ class AuthController {
             const loginData: TokenData = req.body;
             const user = await this.prisma.users.findUnique({
                 where: {
-                    user_id:loginData?.userId
+                    user_id: loginData?.userId
                 }
             })
             if (user?.password === loginData.password) {
@@ -42,7 +42,7 @@ class AuthController {
         }
     }
 
-    public resetPassword = async (req: express.Request, res: express.Response) => {
+    public forgetPassword = async (req: express.Request, res: express.Response) => {
         try {
             const userId = req?.body?.userId;
             const user = await this.prisma.users.findUnique({
@@ -51,11 +51,11 @@ class AuthController {
                 }
             });
             if (!user) res.status(404).send({
-              message: 'User not found'  
+                message: 'User not found'
             });
             const randomOTP = Math.floor(Math.random() * 1000000);
             const expiresIn = 120;
-            const token = jwt.sign({id: user.id, role: user.role, otp: randomOTP}, this.secret, {expiresIn});
+            const token = jwt.sign({ id: user.id, role: user.role, otp: randomOTP }, this.secret, { expiresIn });
             console.log(user?.email);
             // send mail with defined transport object
             let info = await transporter.sendMail({
@@ -70,7 +70,7 @@ class AuthController {
                 message: info,
                 token: token
             })
-            
+
         } catch (err) {
             res.status(500).send({
                 message: err
@@ -78,12 +78,99 @@ class AuthController {
         }
     }
 
+    public verifyOtp = async (req: express.Request, res: express.Response) => {
+        try {
+            if (req?.body?.otp) {
+                const otp = parseInt(req?.body?.otp);
+                const requestToken = req?.headers?.authorization?.split(' ')[1];
+                if (requestToken) {
+                    const user: any = jwt.verify(requestToken, this.secret);
+                    if (user.otp === otp) {
+                        const expiresIn = 180;
+                        const token = jwt.sign({ id: user.id, role: user.role, otpSuccess: true }, this.secret, { expiresIn });
+                        res.status(200).send({
+                            message: 'Valid OTP',
+                            token: token
+                        })
+                    } else {
+                        res.status(404).send({
+                            message: 'Invalid OTP'
+                        })
+                    }
+                } else {
+                    res.status(401).send({
+                        message: 'Unauthorized token'
+                    })
+                }
+            } else {
+                res.status(500).send({
+                    message: 'OTP is missing'
+                })
+            }
+        } catch (err) {
+            res.status(500).send({
+                message: err
+            })
+        }
+    }
+
+    public resetPassword = async (req: express.Request, res: express.Response) => {
+        try {
+            const userId = req?.body?.userId;
+            if (req?.headers?.authorization) {
+                const requestToken = req?.headers?.authorization?.split(' ')[1];
+                if (requestToken) {
+                    const verifyToken: any = jwt.verify(requestToken, this.secret);
+                    if (verifyToken?.otpSuccess) {
+                        const user = await this.prisma.users.update({
+                            where: {
+                                user_id: userId
+                            },
+                            data: {
+                                password: req?.body?.password
+                            }
+                        });
+                        if (user) {
+                            res.status(200).send({
+                                message: 'Password updated successfully'
+                            })
+                        }
+                    } else {
+                        throw {
+                            unauthorized: true
+                        }
+                        
+                    }
+                } else {
+                    throw {
+                        unauthorized: true
+                    }
+                }
+            } else {
+                throw {
+                    unauthorized: true
+                }
+            }
+            
+        } catch (err) {
+            if (err.unauthorized) {
+                res.status(401).send({
+                    message: 'Unauthorized User'
+                })
+            } else {
+                res.status(500).send({
+                    message: err
+                })
+            }
+        }
+    }
+
     private generateToken = (user: User) => {
-        const expiresIn = 24*60*60;
-        
+        const expiresIn = 24 * 60 * 60;
+
         return {
             expiresIn,
-            token: jwt.sign({id: user.id, role: user.role}, this.secret, { expiresIn }),
+            token: jwt.sign({ id: user.id, role: user.role }, this.secret, { expiresIn }),
         }
     }
 
