@@ -105,3 +105,6 @@ dist
 
 .env
 
+/storage/*.temp
+
+

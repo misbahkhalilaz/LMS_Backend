@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import * as express from 'express';
 import * as jwt from 'jsonwebtoken';
-import * as crypto from 'crypto';
 import User from './../interfaces/User';
 import TokenData from './../interfaces/TokenData';
 import transporter from '../utils/email/sendEmail';
@@ -54,7 +53,7 @@ class AuthController {
             if (!user) res.status(404).send({
               message: 'User not found'  
             });
-            const randomOTP = Math.floor(100000 + Math.random() * 900000);
+            const randomOTP = Math.floor(Math.random() * 1000000);
             const expiresIn = 120;
             const token = jwt.sign({id: user.id, role: user.role, otp: randomOTP}, this.secret, {expiresIn});
             console.log(user?.email);

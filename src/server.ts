@@ -7,14 +7,14 @@ import router from "./routes";
 class Server {
  
   public app: express.Application;
-
+  
   constructor() {
-    dotenv.config();  
+    dotenv.config();
     this.app = express();
     this.config();
   }
 
-  private config(): void {
+  public config(): void {
     this.app.set('port', process.env.PORT || 3000);
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
@@ -23,10 +23,8 @@ class Server {
   }
 
   public start(): void {
-    // this.app.get('/', (req, res) => prisma.auth.findMany().then(r => res.send(r))) // for hosting build test
     this.app.listen(this.app.get('port'), () => {
       console.log(`Server is listening at port ${this.app.get('port')}`)
-      // console.log(process.env.PORT);
     })
   }
 
