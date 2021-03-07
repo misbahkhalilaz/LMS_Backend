@@ -1,8 +1,6 @@
 export default interface User{
     user_id: string,       
-    password:string,
-    name:string,  
-    phone_no: number,      
+    name: string,  
+    phone_no: string,      
     email: string,
-    admission_year: number,
 }

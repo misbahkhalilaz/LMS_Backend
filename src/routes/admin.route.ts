@@ -6,6 +6,6 @@ const adminRouter: Router = Router();
 const adminController = new AdminController();
 const uploader = new UploadFile();
 
-adminRouter.post('/createAccounts', uploader.upload.single('students'), adminController.createStdAccounts);
+adminRouter.post('/createAccounts', uploader.upload.single('students'), adminController.createStdAccounts); //store uploaded file
 
 export default adminRouter;
