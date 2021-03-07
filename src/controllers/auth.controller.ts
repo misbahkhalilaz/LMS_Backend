@@ -7,7 +7,7 @@ import transporter from '../utils/email/sendEmail';
 
 class AuthController {
 
-    private prisma: any = new PrismaClient();
+    private prisma: any;
     private secret: any;
 
     constructor() {
@@ -30,17 +30,18 @@ class AuthController {
                     token: tokenData?.token
                 })
             } 
-            else if (user?.password === null) { // if pass is null, means user registered by admin but user never setup it's account.
+            else
+                if (user?.password === null) { // if pass is null, means user registered by admin but user never setup it's account.
                 res.status(401).send({
-                    message: 'Account regestred but incomplete, create password for your account.'
+                    message: 'Account regesterd but incomplete, create password for your account.'
                 });
-            } 
-            else {
-                res.status(401).send({
-                    message: 'Invalid email or password',
-                    token: null
-                });
-            }
+                } 
+                else {
+                    res.status(401).send({
+                        message: 'Invalid email or password',
+                        token: null
+                    });
+                }
         } catch (err) {
             console.log(err);
             res.status(500).send({
@@ -60,9 +61,9 @@ class AuthController {
             if (!user) res.status(404).send({
                 message: 'User not found'
             });
-            const randomOTP = Math.floor(Math.random() * 1000000);
+            const randomOTP = Math.floor(100000 + Math.random() * 900000);
             const expiresIn = 120;
-            const token = jwt.sign({ id: user.id, role: user.role, otp: randomOTP }, this.secret, { expiresIn });
+            const token = jwt.sign({ id: user.id, otp: randomOTP }, this.secret, { expiresIn });
             console.log(user?.email);
             // send mail with defined transport object
             let info = await transporter.sendMail({
@@ -74,7 +75,7 @@ class AuthController {
             });
             console.log("Message sent: %s", info.messageId);
             res.status(200).send({
-                message: info,
+                message: `OTP sent at ${info.accepted[0]}`,
                 token: token
             })
 
@@ -93,8 +94,8 @@ class AuthController {
                 if (requestToken) {
                     const user: any = jwt.verify(requestToken, this.secret);
                     if (user.otp === otp) {
-                        const expiresIn = 180;
-                        const token = jwt.sign({ id: user.id, role: user.role, otpSuccess: true }, this.secret, { expiresIn });
+                        const expiresIn = 5 * 60;
+                        const token = jwt.sign({ id: user.id, otpSuccess: true }, this.secret, { expiresIn });
                         res.status(200).send({
                             message: 'Valid OTP',
                             token: token
@@ -123,7 +124,6 @@ class AuthController {
 
     public resetPassword = async (req: express.Request, res: express.Response) => {
         try {
-            const userId = req?.body?.userId;
             if (req?.headers?.authorization) {
                 const requestToken = req?.headers?.authorization?.split(' ')[1];
                 if (requestToken) {
@@ -131,7 +131,7 @@ class AuthController {
                     if (verifyToken?.otpSuccess) {
                         const user = await this.prisma.users.update({
                             where: {
-                                user_id: userId
+                                id: verifyToken.id
                             },
                             data: {
                                 password: req?.body?.password
