@@ -23,19 +23,26 @@ class AuthController {
                     user_id: loginData?.userId
                 }
             })
-            if (user?.password === loginData.password) {
+            if (user?.password && user?.password === loginData.password) {  // check if user & it's password exists && user pass matches
                 const tokenData = this.generateToken(user);
                 res.status(200).send({
                     message: 'Login successfully',
                     token: tokenData?.token
                 })
-            } else {
+            } 
+            else if (user?.password === null) { // if pass is null, means user registered by admin but user never setup it's account.
+                res.status(401).send({
+                    message: 'Account regestred but incomplete, create password for your account.'
+                });
+            } 
+            else {
                 res.status(401).send({
                     message: 'Invalid email or password',
                     token: null
                 });
             }
         } catch (err) {
+            console.log(err);
             res.status(500).send({
                 message: err
             })
