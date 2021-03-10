@@ -4,6 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import User from './../interfaces/User';
 import TokenData from './../interfaces/TokenData';
 import transporter from '../utils/email/sendEmail';
+import bcrypt from 'bcrypt';
 
 class AuthController {
 
@@ -11,7 +12,7 @@ class AuthController {
     private secret: any;
 
     constructor() {
-        this.secret = process.env.secret
+        this.secret = process.env.secret;
         this.prisma = new PrismaClient();
     }
 
@@ -23,12 +24,22 @@ class AuthController {
                     user_id: loginData?.userId
                 }
             })
-            if (user?.password && user?.password === loginData.password) {  // check if user & it's password exists && user pass matches
-                const tokenData = this.generateToken(user);
-                res.status(200).send({
-                    message: 'Login successfully',
-                    token: tokenData?.token
-                })
+            if (user?.password) {  // check if user & it's password exists && user pass matches
+                const compare: boolean = await bcrypt.compare(loginData.password, user.password);
+                if (compare) {
+                   const tokenData = this.generateToken(user);
+                    res.status(200).send({
+                        message: 'Login successfully',
+                        token: tokenData?.token
+                    }) 
+                }
+                 else {
+                    res.status(401).send({
+                        message: 'wrong password',
+                        token: null
+                    });
+                }
+                
             } 
             else
                 if (user?.password === null) { // if pass is null, means user registered by admin but user never setup it's account.
@@ -129,12 +140,13 @@ class AuthController {
                 if (requestToken) {
                     const verifyToken: any = jwt.verify(requestToken, this.secret);
                     if (verifyToken?.otpSuccess) {
+                        const pass = await bcrypt.hash(req?.body?.password, 10);
                         const user = await this.prisma.users.update({
                             where: {
                                 id: verifyToken.id
                             },
                             data: {
-                                password: req?.body?.password
+                                password: pass
                             }
                         });
                         if (user) {
