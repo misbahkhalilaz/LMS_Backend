@@ -3,7 +3,7 @@ import cors from "cors";
 import * as bodyParser from "body-parser";
 import * as dotenv from "dotenv";
 import router from "./routes";
-import checkToken from "./midllewares/auth.middleware";
+import checkToken from "./midllewares/app.middleware";
 
 class Server {
   public app: express.Application;

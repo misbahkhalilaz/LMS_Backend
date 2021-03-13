@@ -1,20 +1,14 @@
-import * as express from "express";
-import * as jwt from "jsonwebtoken";
+import { Request, Response, NextFunction } from "express";
 
-const checkToken = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) => {
-  const openPaths = ["/auth/login", "/auth/forgetPassword"];
-    if (req.headers.authorization) {
-    //   break token, check bearer, decrypt it and attach to req.
-    next();
-  } else if (openPaths.includes(req.path)) {
+export default function authRole(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  role: string
+) {
+  if (req.body.tokenData.role === role) {
     next();
   } else {
-    res.send({ message: "Bearer token required in authorization header" });
+    res.status(401).send({ message: "unauthorized access" });
   }
-};
-
-export default checkToken;
+}
