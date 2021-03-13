@@ -1,7 +1,7 @@
 import * as express from "express";
 import fs from "fs";
 import xlsToJson from "convert-excel-to-json";
-import User from "../interfaces/createUser";
+import { User, Teacher } from "../interfaces/createUser";
 import { PrismaClient } from "@prisma/client";
 
 export default class AdminController {
@@ -55,6 +55,32 @@ export default class AdminController {
     } catch (error) {
       console.log(error);
       res.status(500).send(error);
+    }
+  };
+
+  public createTeacherAccounts = async (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      const teacher: Teacher = {
+        user_id: req.body.userId,
+        name: req.body.name,
+        phone_no: req.body.phone_no,
+        email: req.body.email,
+        role: "teacher",
+      };
+      this.prisma.users
+        .create({ data: teacher })
+        .then((status) =>
+          res.status(200).send({ message: status.user_id + " added." })
+        )
+        .catch((error) => {
+          console.log(error);
+          throw { error };
+        });
+    } catch (error) {
+      res.status(500).send({ message: "unable to insert data in DB.", error });
     }
   };
 }
