@@ -71,7 +71,11 @@ export default class AdminController {
         role: "teacher",
       };
       this.prisma.users
-        .create({ data: teacher })
+        .upsert({
+          where: { user_id: teacher.user_id },
+          update: teacher,
+          create: teacher,
+        })
         .then((status) =>
           res.status(200).send({ message: status.user_id + " added." })
         )
