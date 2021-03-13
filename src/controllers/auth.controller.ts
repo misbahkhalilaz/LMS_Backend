@@ -46,7 +46,7 @@ class AuthController {
             expiresIn: 24 * 60 * 60,
           });
           const loggedIn: LoginRes = {
-            message: "Login successfully",
+            message: "Loggedin successfully",
             role: user.role,
             token,
           };
@@ -94,7 +94,7 @@ class AuthController {
         });
       const randomOTP = Math.floor(100000 + Math.random() * 900000);
       const forgetpassToken: ForgetpassToken = { id: user.id, otp: randomOTP };
-      const token = jwt.sign(forgetpassToken, this.secret, {
+      const token = await jwt.sign(forgetpassToken, this.secret, {
         expiresIn: 120,
       });
       console.log(user?.email);
@@ -123,9 +123,8 @@ class AuthController {
     try {
       if (req?.body?.otp) {
         const otp = parseInt(req?.body?.otp);
-        const requestToken = req?.headers?.authorization?.split(" ")[1];
-        if (requestToken) {
-          const user: any = jwt.verify(requestToken, this.secret);
+        const user: any = req.body.tokenData;
+        if (user) {
           if (user.otp === otp) {
             const otpToken: VerifyOtpToken = { id: user.id, otpSuccess: true };
             const token = jwt.sign(otpToken, this.secret, {
@@ -163,40 +162,25 @@ class AuthController {
     res: express.Response
   ) => {
     try {
-      if (req?.headers?.authorization) {
-        const requestToken = req?.headers?.authorization?.split(" ")[1];
-        if (requestToken) {
-          const verifyToken: any = jwt.verify(requestToken, this.secret);
-          if (verifyToken?.otpSuccess) {
-            const pass = await bcrypt.hash(req?.body?.password, 10);
-            const user = await this.prisma.users.update({
-              where: {
-                id: verifyToken.id,
-              },
-              data: {
-                password: pass,
-              },
-            });
-            if (user) {
-              res.status(200).send({
-                message: "Password updated successfully",
-              });
-            }
-          } else {
-            throw {
-              unauthorized: true,
-            };
-          }
-        } else {
-          throw {
-            unauthorized: true,
-          };
+      if (req.body.tokenData?.otpSuccess) {
+        const pass = await bcrypt.hash(req?.body?.password, 10);
+        const user = await this.prisma.users.update({
+          where: {
+            id: req.body.tokenData.id,
+          },
+          data: {
+            password: pass,
+          },
+        });
+        if (user) {
+          res.status(200).send({
+            message: "Password updated successfully",
+          });
         }
-      } else {
+      } else
         throw {
           unauthorized: true,
         };
-      }
     } catch (err) {
       if (err.unauthorized) {
         res.status(401).send({
