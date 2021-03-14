@@ -1,7 +1,7 @@
 import * as express from "express";
 import fs from "fs";
 import xlsToJson from "convert-excel-to-json";
-import { User, Teacher } from "../interfaces/CreateUser";
+import { User, Teacher } from "../interfaces/createUser";
 import Program from "../interfaces/Program";
 import { PrismaClient } from "@prisma/client";
 
