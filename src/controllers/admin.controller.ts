@@ -45,10 +45,7 @@ export default class AdminController {
           })
           .then((status) =>
             res.status(200).send({ message: status.count + " Records added." })
-          )
-          .catch((err) => {
-            throw { error: err };
-          });
+          );
       } else
         throw {
           error: "unable to read file",

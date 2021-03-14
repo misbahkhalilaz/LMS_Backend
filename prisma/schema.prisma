@@ -11,7 +11,7 @@ datasource db {
 model users {
   id             Int      @id @default(autoincrement())
   user_id        String   @unique @db.VarChar(50)
-  password       String?  @db.VarChar(100)
+  password       String?  @db.VarChar(72)
   role           String   @default("student") @db.VarChar(10)
   name           String   @db.VarChar(30)
   phone_no       String   @db.VarChar(11)
@@ -21,8 +21,20 @@ model users {
 }
 
 model programs {
-  id              Int     @id @default(autoincrement())
-  name            String  @db.VarChar(30)
-  no_of_years     Decimal @db.Decimal(1, 0)
-  max_enrol_years Decimal @db.Decimal(2, 0)
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(30)
+  no_of_years     Decimal   @db.Decimal(1, 0)
+  max_enrol_years Decimal   @db.Decimal(2, 0)
+  courses         courses[]
+}
+
+model courses {
+  id          Int      @id @default(autoincrement())
+  program_id  Int
+  semester    Decimal  @db.Decimal(2, 0)
+  name        String   @db.VarChar(50)
+  credit_hr   Decimal  @db.Decimal(1, 0)
+  total_marks Decimal  @db.Decimal(3, 0)
+  isActive    Boolean  @default(true)
+  programs    programs @relation(fields: [program_id], references: [id])
 }
