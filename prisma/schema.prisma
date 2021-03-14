@@ -19,3 +19,10 @@ model users {
   admission_year Decimal? @db.Decimal(4, 0)
   isActive       Boolean  @default(true)
 }
+
+model programs {
+  id              Int     @id @default(autoincrement())
+  name            String  @db.VarChar(30)
+  no_of_years     Decimal @db.Decimal(1, 0)
+  max_enrol_years Decimal @db.Decimal(2, 0)
+}
