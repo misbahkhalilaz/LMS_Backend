@@ -29,45 +29,45 @@ class AuthController {
           user_id: loginData?.userId,
         },
       });
-      if (user?.password) {
-        // check if user & it's password exists && user pass matches
-        const compare: boolean = await bcrypt.compare(
-          loginData.password,
-          user.password
-        );
-        if (compare) {
-          const tokenData: LoginToken = {
-            id: user.id,
-            password: loginData.password,
-            role: user.role,
-          };
+      if (!user) {
+        res.status(401).send({ message: "user does not exist" });
+      } else if (user.isActive) {
+        if (user.password) {
+          // check if user & it's password exists && user pass matches
+          const compare: boolean = await bcrypt.compare(
+            loginData.password,
+            user.password
+          );
+          if (compare) {
+            const tokenData: LoginToken = {
+              id: user.id,
+              password: loginData.password,
+              role: user.role,
+            };
 
-          const token = jwt.sign(tokenData, this.secret, {
-            expiresIn: 24 * 60 * 60,
-          });
-          const loggedIn: LoginRes = {
-            message: "Loggedin successfully",
-            role: user.role,
-            token,
-          };
-          res.status(200).send(loggedIn);
+            const token = jwt.sign(tokenData, this.secret, {
+              expiresIn: 24 * 60 * 60,
+            });
+            const loggedIn: LoginRes = {
+              message: "Loggedin successfully",
+              role: user.role,
+              token,
+            };
+            res.status(200).send(loggedIn);
+          } else {
+            res.status(401).send({
+              message: "wrong password",
+            });
+          }
         } else {
+          // if pass is null, means user registered by admin but user never setup it's account.
           res.status(401).send({
-            message: "wrong password",
-            token: null,
+            message:
+              "Account setup incomplete, create password for your account.",
           });
         }
-      } else if (user?.password === null) {
-        // if pass is null, means user registered by admin but user never setup it's account.
-        res.status(401).send({
-          message:
-            "Account regesterd but incomplete, create password for your account.",
-        });
       } else {
-        res.status(401).send({
-          message: "Invalid email or password",
-          token: null,
-        });
+        res.status(401).send({ message: "account disabled, contact admin" });
       }
     } catch (err) {
       console.log(err);

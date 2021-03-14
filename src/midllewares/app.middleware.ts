@@ -26,12 +26,18 @@ const checkToken = async (
               id: tokenData?.id,
             },
           });
-          if (await bcrypt.compare(tokenData?.password, user?.password)) {
-            req.body.tokenData = { id: tokenData.id, role: tokenData.role };
-            next();
+          if (user?.isActive) {
+            if (await bcrypt.compare(tokenData?.password, user?.password)) {
+              req.body.tokenData = { id: tokenData.id, role: tokenData.role };
+              next();
+            } else {
+              throw {
+                message: "your password recently changed",
+              };
+            }
           } else {
             throw {
-              message: "wrong credentials",
+              message: "account disabled, contact admin",
             };
           }
         }
