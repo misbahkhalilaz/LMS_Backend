@@ -11,7 +11,9 @@ const checkToken = async (
   try {
     const openPaths = ["/auth/login", "/auth/forgetPassword"];
     const specialTokenPaths = ["/auth/verifyOtp", "/auth/resetPassword"];
-    if (req.headers.authorization) {
+    if (openPaths.includes(req.path)) {
+      next();
+    } else if (req.headers.authorization) {
       const requestToken = req?.headers?.authorization?.split(" ")[1];
       if (requestToken) {
         const secret: any = await process.env.secret;
@@ -44,8 +46,6 @@ const checkToken = async (
       } else {
         throw { message: "Bearer token required in authorization header" };
       }
-    } else if (openPaths.includes(req.path)) {
-      next();
     } else {
       throw { message: "Bearer token required in authorization header" };
     }
