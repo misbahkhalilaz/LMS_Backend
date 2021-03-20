@@ -1,7 +1,7 @@
 import * as express from "express";
 import fs from "fs";
 import xlsToJson from "convert-excel-to-json";
-import { User, Teacher, Program, Course } from "../interfaces/Admin";
+import { User, Teacher, Program, Course, Batch } from "../interfaces/Admin";
 
 export default class AdminController {
   public createStdAccounts = async (
@@ -75,7 +75,7 @@ export default class AdminController {
         )
         .catch((error) => {
           console.log(error);
-          throw { error };
+          res.status(500).send(error);
         });
     } catch (error) {
       res.status(500).send({ message: "unable to insert data in DB.", error });
@@ -87,19 +87,19 @@ export default class AdminController {
     res: express.Response
   ) => {
     try {
-      const program: Program = {
+      const data: Program = {
         name: req.body.name,
         no_of_years: req.body.noOfYears,
         max_enrol_years: req.body.maxEnrolYears,
       };
       prisma.programs
-        .create({ data: program })
+        .create({ data })
         .then((status) =>
           res.status(200).send({ message: status.name + " added." })
         )
         .catch((error) => {
           console.log(error);
-          throw { error };
+          res.status(500).send(error);
         });
     } catch (error) {
       res.status(500).send({ message: "unable to insert data in DB.", error });
@@ -108,21 +108,45 @@ export default class AdminController {
 
   public createCourse = async (req: express.Request, res: express.Response) => {
     try {
-      const course: Course = {
+      const data: Course = {
         program_id: req.body.programId,
         name: req.body.name,
+        code: req.body.code,
         credit_hr: req.body.creditHr,
         semester: req.body.semester,
         total_marks: req.body.totalMarks,
       };
       prisma.courses
-        .create({ data: course })
+        .create({ data })
         .then((status) =>
           res.status(200).send({ message: status.name + " added." })
         )
         .catch((error) => {
           console.log(error);
-          throw { error };
+          res.status(500).send(error);
+        });
+    } catch (error) {
+      res.status(500).send({ message: "unable to insert data in DB.", error });
+    }
+  };
+
+  public createBatch = async (req: express.Request, res: express.Response) => {
+    try {
+      const data: Batch = {
+        program_id: req.body.programId,
+        name: req.body.name,
+        shift: req.body.shift,
+        starting_yr: req.body.startingYr,
+        ending_yr: req.body.endingYr,
+      };
+      prisma.batch
+        .create({ data })
+        .then((status) =>
+          res.status(200).send({ message: status.name + " added." })
+        )
+        .catch((error) => {
+          console.log(error);
+          res.status(500).send(error);
         });
     } catch (error) {
       res.status(500).send({ message: "unable to insert data in DB.", error });

@@ -19,6 +19,15 @@ export interface Course {
   program_id: number;
   semester: number;
   name: string;
+  code: string;
   credit_hr: number;
   total_marks: number;
+}
+
+export interface Batch {
+  program_id: number;
+  name: string;
+  shift: string;
+  starting_yr: string;
+  ending_yr: string;
 }
