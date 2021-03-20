@@ -4,8 +4,8 @@
   "description": "The project belongs to the learing management system in which student of the department of computer science can benefit online classes due to COVID-19",
   "main": "server.ts",
   "scripts": {
-    "start": "node build/server.js",
-    "dev": "nodemon src/server.ts",
+    "start": "node -r dotenv/config build/server.js",
+    "dev": "nodemon -r dotenv/config src/server.ts",
     "build": "tsc",
     "prisma": "prisma introspect && prisma generate"
   },

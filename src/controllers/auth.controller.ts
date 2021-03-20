@@ -1,4 +1,3 @@
-import { PrismaClient } from "@prisma/client";
 import * as express from "express";
 import * as jwt from "jsonwebtoken";
 import {
@@ -11,20 +10,17 @@ import {
 } from "../interfaces/Auth";
 import transporter from "../utils/email/sendEmail";
 import bcrypt from "bcrypt";
-
 class AuthController {
-  private prisma: any;
   private secret: any;
 
   constructor() {
     this.secret = process.env.secret;
-    this.prisma = new PrismaClient();
   }
 
   public login = async (req: express.Request, res: express.Response) => {
     try {
       const loginData: LoginReq = req.body;
-      const user = await this.prisma.users.findUnique({
+      const user = await prisma.users.findUnique({
         where: {
           user_id: loginData?.userId,
         },
@@ -83,7 +79,7 @@ class AuthController {
   ) => {
     try {
       const userId = req?.body?.userId;
-      const user = await this.prisma.users.findUnique({
+      const user: any = await prisma.users.findUnique({
         where: {
           user_id: userId,
         },
@@ -164,7 +160,7 @@ class AuthController {
     try {
       if (req.body.tokenData?.otpSuccess) {
         const pass = await bcrypt.hash(req?.body?.password, 10);
-        const user = await this.prisma.users.update({
+        const user = await prisma.users.update({
           where: {
             id: req.body.tokenData.id,
           },
