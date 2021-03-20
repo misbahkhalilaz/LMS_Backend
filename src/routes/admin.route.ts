@@ -16,5 +16,6 @@ adminRouter.post(
   adminController.createTeacherAccounts
 );
 adminRouter.post("/createProgram", adminController.createProgram);
+adminRouter.post("/createCourse", adminController.createCourse);
 
 export default adminRouter;

@@ -1,9 +1,7 @@
 import * as express from "express";
 import fs from "fs";
 import xlsToJson from "convert-excel-to-json";
-import { User, Teacher } from "../interfaces/createUser";
-import Program from "../interfaces/Program";
-import { PrismaClient } from "@prisma/client";
+import { User, Teacher, Program, Course } from "../interfaces/Admin";
 
 export default class AdminController {
   public createStdAccounts = async (
@@ -96,6 +94,29 @@ export default class AdminController {
       };
       prisma.programs
         .create({ data: program })
+        .then((status) =>
+          res.status(200).send({ message: status.name + " added." })
+        )
+        .catch((error) => {
+          console.log(error);
+          throw { error };
+        });
+    } catch (error) {
+      res.status(500).send({ message: "unable to insert data in DB.", error });
+    }
+  };
+
+  public createCourse = async (req: express.Request, res: express.Response) => {
+    try {
+      const course: Course = {
+        program_id: req.body.programId,
+        name: req.body.name,
+        credit_hr: req.body.creditHr,
+        semester: req.body.semester,
+        total_marks: req.body.totalMarks,
+      };
+      prisma.courses
+        .create({ data: course })
         .then((status) =>
           res.status(200).send({ message: status.name + " added." })
         )

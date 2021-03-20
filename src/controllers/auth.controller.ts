@@ -10,6 +10,7 @@ import {
 } from "../interfaces/Auth";
 import transporter from "../utils/email/sendEmail";
 import bcrypt from "bcrypt";
+
 class AuthController {
   private secret: any;
 
