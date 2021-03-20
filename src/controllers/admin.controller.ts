@@ -6,8 +6,6 @@ import Program from "../interfaces/Program";
 import { PrismaClient } from "@prisma/client";
 
 export default class AdminController {
-  private prisma: PrismaClient = new PrismaClient();
-
   public createStdAccounts = async (
     req: express.Request,
     res: express.Response
@@ -35,7 +33,7 @@ export default class AdminController {
       fs.unlink(req.file.path, () => console.log(req.file.path, "deleted")); // delete xls file after storing data to db
 
       if (students) {
-        this.prisma.users
+        prisma.users
           .createMany({
             data: students.map((std) => ({
               ...std,
@@ -68,7 +66,7 @@ export default class AdminController {
         email: req.body.email,
         role: "teacher",
       };
-      this.prisma.users
+      prisma.users
         .upsert({
           where: { user_id: teacher.user_id },
           update: teacher,
@@ -96,7 +94,7 @@ export default class AdminController {
         no_of_years: req.body.noOfYears,
         max_enrol_years: req.body.maxEnrolYears,
       };
-      this.prisma.programs
+      prisma.programs
         .create({ data: program })
         .then((status) =>
           res.status(200).send({ message: status.name + " added." })

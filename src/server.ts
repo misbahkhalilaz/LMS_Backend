@@ -1,15 +1,20 @@
 import express from "express";
 import cors from "cors";
 import * as bodyParser from "body-parser";
-import * as dotenv from "dotenv";
 import router from "./routes";
 import checkToken from "./midllewares/app.middleware";
+import { PrismaClient } from "@prisma/client";
+
+declare global {
+  var prisma: PrismaClient;
+}
+
+global.prisma = new PrismaClient();
 
 class Server {
   public app: express.Application;
 
   constructor() {
-    dotenv.config();
     this.app = express();
     this.config();
   }

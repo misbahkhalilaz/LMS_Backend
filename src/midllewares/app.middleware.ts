@@ -1,6 +1,5 @@
 import * as express from "express";
 import * as jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 
 const checkToken = async (
@@ -22,7 +21,6 @@ const checkToken = async (
           req.body.tokenData = tokenData;
           next();
         } else {
-          const prisma = new PrismaClient();
           const user: any = await prisma.users.findUnique({
             where: {
               id: tokenData?.id,
