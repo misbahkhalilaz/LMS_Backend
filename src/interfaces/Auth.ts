@@ -15,7 +15,11 @@ export interface AuthRes {
 }
 
 export interface LoginRes extends AuthRes {
+  userId: string;
+  name: string;
   role: string;
+  phone: string;
+  email: string | null;
 }
 
 export interface ForgetpassToken {

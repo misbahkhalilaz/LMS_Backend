@@ -4,7 +4,7 @@ import UploadFile from "../utils/uploadFile";
 
 const adminRouter: Router = Router();
 const adminController = new AdminController();
-const uploader = new UploadFile();
+const uploader = new UploadFile(2);
 
 adminRouter.post(
   "/createAccounts",
@@ -17,6 +17,10 @@ adminRouter.post(
 );
 adminRouter.post("/createProgram", adminController.createProgram);
 adminRouter.post("/createCourse", adminController.createCourse);
-adminRouter.post("/createBatch", adminController.createBatch);
+adminRouter.post(
+  "/createBatch",
+  uploader.upload.any(),
+  adminController.createBatch
+);
 
 export default adminRouter;

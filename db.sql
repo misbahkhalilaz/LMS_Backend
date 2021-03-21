@@ -38,3 +38,15 @@ CREATE TABLE "batch" (
 	"current_semester" NUMERIC(2) NOT NULL DEFAULT 1,
 	"isActive" BOOLEAN NOT NULL default true
 );
+
+CREATE TABLE "sections" (
+	"id" INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	"name" varchar(50) NOT NULL UNIQUE,
+	"batch_id" INT NOT NULL REFERENCES public.batch(id),
+);
+
+CREATE TABLE "std_groups" (
+	"id" INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	"section_id" INT NOT NULL REFERENCES public.sections(id),
+	"student_id" INT NOT NULL REFERENCES public.users(id)
+);

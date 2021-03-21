@@ -30,7 +30,13 @@ const checkToken = async (
             if (await bcrypt.compare(tokenData?.password, user?.password)) {
               req.body.tokenData = { id: tokenData.id, role: tokenData.role };
               if (req.path === "/auth") {
-                res.status(200).send({ role: req.body.tokenData.role });
+                res.status(200).send({
+                  userId: user.user_id,
+                  name: user.name,
+                  role: user.role,
+                  email: user.email,
+                  phone: user.phone_no,
+                });
               }
               next();
             } else {

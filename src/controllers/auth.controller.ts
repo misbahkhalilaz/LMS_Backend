@@ -47,8 +47,12 @@ class AuthController {
             });
             const loggedIn: LoginRes = {
               message: "Loggedin successfully",
-              role: user.role,
               token,
+              userId: user.user_id,
+              name: user.name,
+              role: user.role,
+              email: user.email,
+              phone: user.phone_no,
             };
             res.status(200).send(loggedIn);
           } else {
