@@ -57,7 +57,7 @@ export default class AdminController {
     res: express.Response
   ) => {
     try {
-      const teacher: Teacher = {
+      const data: Teacher = {
         user_id: req.body.userId,
         name: req.body.name,
         phone_no: req.body.phone_no,
@@ -65,11 +65,7 @@ export default class AdminController {
         role: "teacher",
       };
       prisma.users
-        .upsert({
-          where: { user_id: teacher.user_id },
-          update: teacher,
-          create: teacher,
-        })
+        .create({ data })
         .then((status) =>
           res.status(200).send({ message: status.user_id + " added." })
         )
@@ -132,8 +128,9 @@ export default class AdminController {
 
   public createBatch = async (req: express.Request, res: express.Response) => {
     try {
+      console.log(req.files);
       const data: Batch = {
-        program_id: req.body.programId,
+        program_id: parseInt(req.body.programId),
         name: req.body.name,
         shift: req.body.shift,
         starting_yr: req.body.startingYr,
