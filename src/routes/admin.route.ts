@@ -7,11 +7,6 @@ const adminController = new AdminController();
 const uploader = new UploadFile(3);
 
 adminRouter.post(
-  "/createAccounts",
-  uploader.upload.single("students"),
-  adminController.createStdAccounts
-);
-adminRouter.post(
   "/createTeacherAccount",
   adminController.createTeacherAccounts
 );

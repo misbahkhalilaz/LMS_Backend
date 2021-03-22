@@ -4,53 +4,6 @@ import xlsToJson from "convert-excel-to-json";
 import { User, Teacher, Program, Course, Batch } from "../interfaces/Admin";
 
 export default class AdminController {
-  public createStdAccounts = async (
-    req: express.Request,
-    res: express.Response
-  ) => {
-    try {
-      if (!req.file) {
-        throw {
-          error: "file not attached",
-        };
-      }
-      const students: Array<User> = await xlsToJson({
-        // convert uploaded xls to Json
-        sourceFile: req.file.path,
-        header: {
-          rows: 1,
-        },
-        columnToKey: {
-          A: "user_id",
-          B: "name",
-          C: "phone_no",
-          D: "email",
-        },
-      }).Sheet1;
-
-      fs.unlink(req.file.path, () => console.log(req.file.path, "deleted")); // delete xls file after storing data to db
-
-      if (students) {
-        prisma.users
-          .createMany({
-            data: students.map((std) => ({
-              ...std,
-              phone_no: std.phone_no.toString(),
-            })),
-            skipDuplicates: true,
-          })
-          .then((status) =>
-            res.status(200).send({ message: status.count + " Records added." })
-          );
-      } else
-        throw {
-          error: "unable to read file",
-        };
-    } catch (error) {
-      console.log(error);
-      res.status(500).send(error);
-    }
-  };
 
   public createTeacherAccounts = async (
     req: express.Request,
@@ -126,15 +79,16 @@ export default class AdminController {
     }
   };
 
-  private createBatchPayload = async (req:any) => {
-    const files:any = await req.files
-      let payload = {
-        program_id: parseInt(req.body.programId),
-        name: req.body.name,
-        shift: req.body.shift,
-        starting_yr: req.body.startingYr,
-        ending_yr: req.body.endingYr,
-        sections: await {create: files.map((file:any) => {
+  private createBatchPayload = async (req: any) => {
+    const files: any = await req.files
+    let payload = {
+      program_id: parseInt(req.body.programId),
+      name: req.body.name,
+      shift: req.body.shift,
+      starting_yr: req.body.startingYr,
+      ending_yr: req.body.endingYr,
+      sections: await {
+        create: files.map((file: any) => {
           let users = xlsToJson({
             // convert uploaded xls to Json
             sourceFile: file.path,
@@ -149,31 +103,39 @@ export default class AdminController {
             },
           }).Sheet1
           return {
-              name: file.fieldname,
-              users: {create: users.map(user => ({...user, phone_no: user.phone_no.toString()}))}
-            }} )
-      
+            name: file.fieldname,
+            users: {create: users.map(user => ({...user, phone_no: user.phone_no.toString()}))}
+          }} )
+
       }
-      }
-      return payload
+    }
+    return payload
   }
 
   public createBatch = async (req: express.Request, res: express.Response) => {
     try {
       // console.log(req.files);
-      let data = await this.createBatchPayload(req);
-      let files:any = req.files;
-      files.forEach((file:any) => fs.unlink(file.path, () => console.log(file.path, "deleted")))
-      // res.send(data)
-      prisma.batch
-        .create({data})
-        .then((status) =>
-          res.status(200).send({ message: status.name + " added." })
-        )
-        .catch((error) => {
-          console.log(error);
-          res.status(500).send(error);
-        });
+      let files: any = req.files;
+      if(files){
+        let data = await this.createBatchPayload(req);
+        files.forEach((file: any) => fs.unlink(file.path, () => console.log(file.path, "deleted")))
+        // res.send(data)
+        prisma.batch
+          .create({data})
+          .then((status) =>{
+            console.log(status)
+            res.status(200).send({ message: status.name + " added." })
+          }
+          )
+          .catch((error) => {
+            console.log(error);
+            res.status(500).send(error);
+          })}
+          else{
+            throw{
+              error: "files missing"
+            }
+          }
     } catch (error) {
       console.log(error)
       res.status(500).send({ message: "unable to insert data in DB.", error });
