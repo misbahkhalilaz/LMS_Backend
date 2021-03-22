@@ -4,7 +4,7 @@ import UploadFile from "../utils/uploadFile";
 
 const adminRouter: Router = Router();
 const adminController = new AdminController();
-const uploader = new UploadFile(2);
+const uploader = new UploadFile(3);
 
 adminRouter.post(
   "/createAccounts",
