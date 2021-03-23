@@ -20,6 +20,8 @@ model users {
   isActive       Boolean   @default(true)
   section_id     Int?
   classes        classes[]
+  sections       sections? @relation(fields: [sectionsId], references: [id])
+  sectionsId     Int?
 }
 
 model programs {
@@ -58,22 +60,21 @@ model batch {
 }
 
 model sections {
-  id       Int       @id @default(autoincrement())
-  name     String    @db.VarChar(50)
+  id       Int     @id @default(autoincrement())
+  name     String  @db.VarChar(50)
   batch_id Int
-  batch    batch     @relation(fields: [batch_id], references: [id])
-  classes  classes[]
+  batch    batch   @relation(fields: [batch_id], references: [id])
+  users    users[]
 }
 
 model classes {
-  id         Int      @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
   course_id  Int
   section_id Int
   teacher_id Int
-  isActive   Boolean  @default(true)
-  courses    courses  @relation(fields: [course_id], references: [id])
-  sections   sections @relation(fields: [section_id], references: [id])
-  users      users    @relation(fields: [teacher_id], references: [id])
+  isActive   Boolean @default(true)
+  courses    courses @relation(fields: [course_id], references: [id])
+  users      users   @relation(fields: [teacher_id], references: [id])
 
   @@unique([course_id, section_id, teacher_id], name: "classes_course_id_section_id_teacher_id_key")
 }

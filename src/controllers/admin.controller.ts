@@ -84,15 +84,15 @@ export default class AdminController {
     }
   };
 
-  private createBatchPayload = async (req: express.Request) => {
-    const files: any = await req.files;
+  private createBatchPayload = (req: express.Request) => {
+    const files: any = req.files;
     let payload = {
       program_id: parseInt(req.body.programId),
       name: req.body.name,
       shift: req.body.shift,
       starting_yr: req.body.startingYr,
       ending_yr: req.body.endingYr,
-      sections: await {
+      sections: {
         create: files.map((file: any) => {
           let users = xlsToJson({
             // convert uploaded xls to Json
@@ -127,7 +127,7 @@ export default class AdminController {
       // console.log(req.files);
       let files: any = req.files;
       if (files) {
-        let data = await this.createBatchPayload(req);
+        let data = this.createBatchPayload(req);
         files.forEach((file: any) =>
           fs.unlink(file.path, () => console.log(file.path, "deleted"))
         );
