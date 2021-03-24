@@ -8,29 +8,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
-  id             Int       @id @default(autoincrement())
-  user_id        String    @unique @db.VarChar(50)
-  password       String?   @db.VarChar(72)
-  role           String    @default("student") @db.VarChar(10)
-  name           String    @db.VarChar(30)
-  phone_no       String    @db.VarChar(11)
-  email          String?   @db.VarChar(50)
-  admission_year Decimal?  @db.Decimal(4, 0)
-  isActive       Boolean   @default(true)
-  section_id     Int?
-  classes        classes[]
-  sections       sections? @relation(fields: [sectionsId], references: [id])
-  sectionsId     Int?
-}
-
-model programs {
-  id              Int       @id @default(autoincrement())
-  name            String    @unique @db.VarChar(30)
-  no_of_years     Decimal   @db.Decimal(1, 0)
-  max_enrol_years Decimal   @db.Decimal(2, 0)
-  batch           batch[]
-  courses         courses[]
+model batch {
+  id               Int        @id @default(autoincrement())
+  program_id       Int
+  name             String     @unique @db.VarChar(50)
+  shift            String     @db.VarChar(7)
+  starting_yr      String     @db.VarChar(8)
+  ending_yr        String     @db.VarChar(8)
+  current_semester Decimal    @default(1) @db.Decimal(2, 0)
+  isActive         Boolean    @default(true)
+  programs         programs   @relation(fields: [program_id], references: [id])
+  sections         sections[]
 }
 
 model courses {
@@ -46,35 +34,48 @@ model courses {
   classes     classes[]
 }
 
-model batch {
-  id               Int        @id @default(autoincrement())
-  program_id       Int
-  name             String     @unique @db.VarChar(50)
-  shift            String     @db.VarChar(7)
-  starting_yr      String     @db.VarChar(8)
-  ending_yr        String     @db.VarChar(8)
-  current_semester Decimal    @default(1) @db.Decimal(2, 0)
-  isActive         Boolean    @default(true)
-  programs         programs   @relation(fields: [program_id], references: [id])
-  sections         sections[]
+model programs {
+  id              Int       @id @default(autoincrement())
+  name            String    @unique @db.VarChar(30)
+  no_of_years     Decimal   @db.Decimal(1, 0)
+  max_enrol_years Decimal   @db.Decimal(2, 0)
+  batch           batch[]
+  courses         courses[]
 }
 
 model sections {
-  id       Int     @id @default(autoincrement())
-  name     String  @db.VarChar(50)
+  id       Int       @id @default(autoincrement())
+  name     String    @db.VarChar(50)
   batch_id Int
-  batch    batch   @relation(fields: [batch_id], references: [id])
+  batch    batch     @relation(fields: [batch_id], references: [id])
+  classes  classes[]
   users    users[]
 }
 
+model users {
+  id             Int       @id @default(autoincrement())
+  section_id     Int       @default(1)
+  user_id        String    @unique @db.VarChar(50)
+  password       String?   @db.VarChar(72)
+  role           String    @default("student") @db.VarChar(10)
+  name           String    @db.VarChar(30)
+  phone_no       String    @db.VarChar(11)
+  email          String?   @db.VarChar(50)
+  admission_year Decimal?  @db.Decimal(4, 0)
+  isActive       Boolean   @default(true)
+  sections       sections  @relation(fields: [section_id], references: [id])
+  classes        classes[]
+}
+
 model classes {
-  id         Int     @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   course_id  Int
   section_id Int
   teacher_id Int
-  isActive   Boolean @default(true)
-  courses    courses @relation(fields: [course_id], references: [id])
-  users      users   @relation(fields: [teacher_id], references: [id])
+  isActive   Boolean  @default(true)
+  courses    courses  @relation(fields: [course_id], references: [id])
+  sections   sections @relation(fields: [section_id], references: [id])
+  users      users    @relation(fields: [teacher_id], references: [id])
 
   @@unique([course_id, section_id, teacher_id], name: "classes_course_id_section_id_teacher_id_key")
 }
