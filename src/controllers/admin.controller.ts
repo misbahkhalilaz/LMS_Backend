@@ -239,4 +239,29 @@ export default class AdminController {
       res.status(500).send({ message: "unable get data from DB.", error });
     }
   };
+
+  public toggleUserInactive = async (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      prisma.users.update({
+        where: { user_id: req.body.userId }, data: { isActive: req.body.isActive }, select: {
+          id: true,
+          user_id: true,
+          name: true,
+          phone_no: true,
+          email: true,
+          role: true,
+          admission_year: true,
+          isActive: true,
+        }
+      })
+        .then(status => res.status(200).send({ message: "User Updated", data: status }))
+        .catch(error => res.status(500).send({ message: "unable to update.", error }))
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: "unable to update.", error });
+    }
+  };
 }

@@ -20,5 +20,6 @@ adminRouter.post(
 adminRouter.post("/createClass", adminController.createClass);
 adminRouter.get("/getProgramData", adminController.getProgramData);
 adminRouter.get("/getUsers", adminController.getUsers);
+adminRouter.post("/toggleUserInactive", adminController.toggleUserInactive)
 
 export default adminRouter;
