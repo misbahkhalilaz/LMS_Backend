@@ -126,13 +126,14 @@ export default class AdminController {
     try {
       // console.log(req.files);
       let files: any = req.files;
-      if (files) {
+      if (files.length >= 1) {
+        console.log(files);
         let data = this.createBatchPayload(req);
         files.forEach((file: any) =>
           fs.unlink(file.path, () => console.log(file.path, "deleted"))
         );
         prisma.batch
-          .create({ data })
+          .create({ data, include: {sections: {include: {users: true}}} })
           .then((status) => {
             console.log(status);
             res
