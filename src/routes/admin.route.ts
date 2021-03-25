@@ -18,7 +18,7 @@ adminRouter.post(
   adminController.createBatch
 );
 adminRouter.post("/createClass", adminController.createClass);
-adminRouter.post("/getProgramData", adminController.getProgramData);
-adminRouter.post("/getUsers", adminController.getUsers);
+adminRouter.get("/getProgramData", adminController.getProgramData);
+adminRouter.get("/getUsers", adminController.getUsers);
 
 export default adminRouter;
