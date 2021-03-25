@@ -185,9 +185,9 @@ export default class AdminController {
     try {
       console.log(req.query);
       let query: any = req.query;
-      let batches = await prisma.programs.findFirst({
+      let batches = await prisma.programs.findMany({
         where: {
-          id: parseInt(query.programId),
+          id: query.programId ? parseInt(query.programId) : undefined,
         },
         include: {
           batch: {
@@ -218,7 +218,7 @@ export default class AdminController {
       let query: any = req.query;
       let data = await prisma.users.findMany({
         where: {
-          isActive: query.isActive === "true",
+          isActive: query.isActive ? query.isActive === "true" : undefined,
           user_id: query.userId,
           role: query.role,
         },
