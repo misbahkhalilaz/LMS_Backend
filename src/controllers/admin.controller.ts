@@ -133,7 +133,7 @@ export default class AdminController {
           fs.unlink(file.path, () => console.log(file.path, "deleted"))
         );
         prisma.batch
-          .create({ data, include: {sections: {include: {users: true}}} })
+          .create({ data, include: { sections: { include: { users: true } } } })
           .then((status) => {
             console.log(status);
             res
@@ -183,15 +183,17 @@ export default class AdminController {
     res: express.Response
   ) => {
     try {
+      console.log(req.query);
+      let query: any = req.query;
       let batches = await prisma.programs.findFirst({
         where: {
-          id: req.body.programId,
+          id: parseInt(query.programId),
         },
         include: {
           batch: {
             where: {
               isActive: true,
-              shift: req.body.shift,
+              shift: query.shift,
             },
             include: {
               sections: true,
@@ -213,11 +215,12 @@ export default class AdminController {
 
   public getUsers = async (req: express.Request, res: express.Response) => {
     try {
+      let query: any = req.query;
       let data = await prisma.users.findMany({
         where: {
-          isActive: req.body.isActive,
-          user_id: req.body.userId,
-          role: req.body.role,
+          isActive: query.isActive === "true",
+          user_id: query.userId,
+          role: query.role,
         },
         select: {
           id: true,
