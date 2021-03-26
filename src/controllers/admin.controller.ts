@@ -4,7 +4,7 @@ import xlsToJson from "convert-excel-to-json";
 import { User, Teacher, Program, Course } from "../interfaces/Admin";
 
 export default class AdminController {
-  public createTeacherAccounts = async (
+  public createTeacherAccounts = (
     req: express.Request,
     res: express.Response
   ) => {
@@ -23,16 +23,13 @@ export default class AdminController {
             .status(200)
             .send({ message: status.user_id + " added.", data: status })
         )
-        .catch((error) => {
-          console.log(error);
-          res.status(500).send(error);
-        });
     } catch (error) {
+      console.log(error);
       res.status(500).send({ message: "unable to insert data in DB.", error });
     }
   };
 
-  public createProgram = async (
+  public createProgram = (
     req: express.Request,
     res: express.Response
   ) => {
@@ -49,16 +46,14 @@ export default class AdminController {
             .status(200)
             .send({ message: status.name + " added.", data: status })
         )
-        .catch((error) => {
-          console.log(error);
-          res.status(500).send(error);
-        });
+        
     } catch (error) {
+      console.log(error);
       res.status(500).send({ message: "unable to insert data in DB.", error });
     }
   };
 
-  public createCourse = async (req: express.Request, res: express.Response) => {
+  public createCourse = (req: express.Request, res: express.Response) => {
     try {
       const data: Course = {
         program_id: req.body.programId,
@@ -75,11 +70,9 @@ export default class AdminController {
             .status(200)
             .send({ message: status.name + " added.", data: status })
         )
-        .catch((error) => {
-          console.log(error);
-          res.status(500).send(error);
-        });
+        
     } catch (error) {
+      console.log(error);
       res.status(500).send({ message: "unable to insert data in DB.", error });
     }
   };
@@ -122,9 +115,8 @@ export default class AdminController {
     return payload;
   };
 
-  public createBatch = async (req: express.Request, res: express.Response) => {
+  public createBatch = (req: express.Request, res: express.Response) => {
     try {
-      // console.log(req.files);
       let files: any = req.files;
       if (files.length >= 1) {
         console.log(files);
@@ -140,10 +132,7 @@ export default class AdminController {
               .status(200)
               .send({ message: status.name + " added.", data: status });
           })
-          .catch((error) => {
-            console.log(error);
-            res.status(500).send(error);
-          });
+         
       } else {
         throw {
           error: "files missing",
@@ -168,10 +157,7 @@ export default class AdminController {
           console.log(status);
           res.status(200).send({ message: "class added.", data: status });
         })
-        .catch((error) => {
-          console.log(error);
-          res.status(500).send(error);
-        });
+      
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable to insert data in DB.", error });
@@ -240,7 +226,7 @@ export default class AdminController {
     }
   };
 
-  public toggleUserInactive = async (
+  public toggleUserInactive = (
     req: express.Request,
     res: express.Response
   ) => {
@@ -258,10 +244,27 @@ export default class AdminController {
         }
       })
         .then(status => res.status(200).send({ message: "User Updated", data: status }))
-        .catch(error => res.status(500).send({ message: "unable to update.", error }))
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable to update.", error });
     }
   };
+
+  public getProgramsWithDetails = (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      prisma.programs.findMany({
+        where: { id: { gt: 1 } },
+        include: {
+          batch: { where: { isActive: true }, include: { sections: true } }
+        }
+      }).then(data => res.status(200).send({message: "data fetched", data}))
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: "unable get data from DB.", error });
+    }
+  }
+
 }
