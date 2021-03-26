@@ -5,7 +5,7 @@ prisma ORM
 CRON  
 Socket.io  
 Postgree  
-MongoDB
+MongoDB  
 Nodemailer
 
 db schema = https://dbdesigner.page.link/tbpfooaWLyHzWdfh9
