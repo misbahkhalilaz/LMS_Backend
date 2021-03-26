@@ -201,12 +201,19 @@ export default class AdminController {
   public getUsers = async (req: express.Request, res: express.Response) => {
     try {
       let query: any = req.query;
+      let where = {
+        isActive: query.isActive ? query.isActive === "true" : undefined,
+        user_id: query.userId,
+        role: query.role,
+      }
+
+      let totalPages: any = null;
+      if(req.query.page === '1'){
+        totalPages = await prisma.users.count({where})
+      }
+
       let data = await prisma.users.findMany({
-        where: {
-          isActive: query.isActive ? query.isActive === "true" : undefined,
-          user_id: query.userId,
-          role: query.role,
-        },
+        where,
         select: {
           id: true,
           user_id: true,
@@ -220,7 +227,7 @@ export default class AdminController {
         skip: query.page ? (parseInt(query.page) - 1) * 20 : 0,
         take: 20
       });
-      res.status(200).send({ message: "data fetched", data });
+      res.status(200).send({ message: "data fetched", data, totalPages: Math.floor((totalPages + 20 - 1) / 20) });
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable get data from DB.", error });
@@ -268,18 +275,25 @@ export default class AdminController {
     }
   }
 
-  public getStudentsBySection = (
+  public getStudentsBySection = async (
     req: express.Request,
     res: express.Response
   ) => {
     try {
       let sectionId: any = req.query.sectionId;
       let page: any = req.query.page;
-      prisma.users.findMany({
-        where: { 
-          section_id: parseInt(sectionId), 
-          isActive: req.query.isActive ? req.query.isActive === "true" : undefined }, 
-          select: {
+      let where =  { 
+        section_id: parseInt(sectionId), 
+        isActive: req.query.isActive ? req.query.isActive === "true" : undefined };
+
+      let totalPages: any = null;
+      if(page === '1'){
+        totalPages = await prisma.users.count({where})
+      }
+
+      let data = await prisma.users.findMany({
+        where, 
+        select: {
             id: true,
             user_id: true,
             name: true,
@@ -292,7 +306,7 @@ export default class AdminController {
         skip: page ? (parseInt(page) - 1) * 20 : 0,
         take: 20
       })
-        .then(data => res.status(200).send({ message: "data fetched.", data }))
+    res.status(200).send({ message: "data fetched.", data, totalPages:  Math.floor((totalPages + 20 - 1) / 20)})
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable get data from DB.", error });
