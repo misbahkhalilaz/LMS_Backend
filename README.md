@@ -6,7 +6,7 @@ CRON
 Socket.io  
 Postgree  
 MongoDB
-
+Nodemailer
 
 db schema = https://dbdesigner.page.link/tbpfooaWLyHzWdfh9
 
