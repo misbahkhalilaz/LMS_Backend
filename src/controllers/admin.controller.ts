@@ -46,7 +46,7 @@ export default class AdminController {
             .status(200)
             .send({ message: status.name + " added.", data: status })
         )
-        
+
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable to insert data in DB.", error });
@@ -70,7 +70,7 @@ export default class AdminController {
             .status(200)
             .send({ message: status.name + " added.", data: status })
         )
-        
+
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable to insert data in DB.", error });
@@ -132,7 +132,7 @@ export default class AdminController {
               .status(200)
               .send({ message: status.name + " added.", data: status });
           })
-         
+
       } else {
         throw {
           error: "files missing",
@@ -157,7 +157,7 @@ export default class AdminController {
           console.log(status);
           res.status(200).send({ message: "class added.", data: status });
         })
-      
+
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable to insert data in DB.", error });
@@ -226,7 +226,7 @@ export default class AdminController {
     }
   };
 
-  public toggleUserInactive = (
+  public changeUserIsactive = (
     req: express.Request,
     res: express.Response
   ) => {
@@ -260,7 +260,35 @@ export default class AdminController {
         include: {
           batch: { where: { isActive: true }, include: { sections: true } }
         }
-      }).then(data => res.status(200).send({message: "data fetched", data}))
+      }).then(data => res.status(200).send({ message: "data fetched", data }))
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: "unable get data from DB.", error });
+    }
+  }
+
+  public getStudentsBySection = (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      let sectionId: any = req.query.sectionId;
+      prisma.users.findMany({
+        where: { 
+          section_id: parseInt(sectionId), 
+          isActive: req.query.isActive ? req.query.isActive === "true" : undefined }, 
+          select: {
+            id: true,
+            user_id: true,
+            name: true,
+            phone_no: true,
+            email: true,
+            role: true,
+            admission_year: true,
+            isActive: true
+        }
+      })
+        .then(data => res.status(200).send({ message: "data fetched.", data }))
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable get data from DB.", error });
