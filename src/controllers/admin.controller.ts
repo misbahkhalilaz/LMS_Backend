@@ -169,7 +169,6 @@ export default class AdminController {
     res: express.Response
   ) => {
     try {
-      console.log(req.query);
       let query: any = req.query;
       let batches = await prisma.programs.findMany({
         where: {
@@ -218,6 +217,8 @@ export default class AdminController {
           admission_year: true,
           isActive: true,
         },
+        skip: query.page ? (parseInt(query.page) - 1) * 20 : 0,
+        take: 20
       });
       res.status(200).send({ message: "data fetched", data });
     } catch (error) {
@@ -273,6 +274,7 @@ export default class AdminController {
   ) => {
     try {
       let sectionId: any = req.query.sectionId;
+      let page: any = req.query.page;
       prisma.users.findMany({
         where: { 
           section_id: parseInt(sectionId), 
@@ -286,7 +288,9 @@ export default class AdminController {
             role: true,
             admission_year: true,
             isActive: true
-        }
+        },
+        skip: page ? (parseInt(page) - 1) * 20 : 0,
+        take: 20
       })
         .then(data => res.status(200).send({ message: "data fetched.", data }))
     } catch (error) {
