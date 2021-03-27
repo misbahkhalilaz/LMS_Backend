@@ -4,6 +4,18 @@ import xlsToJson from "convert-excel-to-json";
 import { User, Teacher, Program, Course } from "../interfaces/Admin";
 
 export default class AdminController {
+
+  private selectUser = {
+    id: true,
+    user_id: true,
+    name: true,
+    phone_no: true,
+    email: true,
+    role: true,
+    admission_year: true,
+    isActive: true,
+  }
+
   public createTeacherAccounts = (
     req: express.Request,
     res: express.Response
@@ -216,16 +228,7 @@ export default class AdminController {
 
       let data = await prisma.users.findMany({
         where,
-        select: {
-          id: true,
-          user_id: true,
-          name: true,
-          phone_no: true,
-          email: true,
-          role: true,
-          admission_year: true,
-          isActive: true,
-        },
+        select: this.selectUser,
         skip: query.page ? (parseInt(query.page) - 1) * pageSize : 0,
         take: pageSize
       });
@@ -242,16 +245,8 @@ export default class AdminController {
   ) => {
     try {
       prisma.users.update({
-        where: { id: req.body.id }, data: { isActive: req.body.isActive }, select: {
-          id: true,
-          user_id: true,
-          name: true,
-          phone_no: true,
-          email: true,
-          role: true,
-          admission_year: true,
-          isActive: true,
-        }
+        where: { id: req.body.id }, data: { isActive: req.body.isActive }, select: this.selectUser,
+
       })
         .then(status => res.status(200).send({ message: "User Updated", data: status }))
     } catch (error) {
@@ -305,16 +300,7 @@ export default class AdminController {
 
       let data = await prisma.users.findMany({
         where,
-        select: {
-          id: true,
-          user_id: true,
-          name: true,
-          phone_no: true,
-          email: true,
-          role: true,
-          admission_year: true,
-          isActive: true
-        },
+        select: this.selectUser,
         skip: query.page ? (parseInt(query.page) - 1) * pageSize : 0,
         take: pageSize
       })
@@ -331,22 +317,35 @@ export default class AdminController {
   ) => {
     try {
       let body: any = req.body
+      let query: any = req.query
+      let pageSize: number = parseInt(query.pageSize) > 0 ? parseInt(query.pageSize) : 20;
+
+      let where = {
+        AND: [
+          body.filters,
+          {
+            OR: [
+              { user_id: { contains: body.query } },
+              { name: { contains: body.query } },
+              { phone_no: { contains: body.query } },
+              { email: { contains: body.query } }
+            ]
+          }
+        ]
+      }
+
+      let totalPages: any = null;
+      if (query.page === '1') {
+        totalPages = await prisma.users.count({ where })
+      }
+
       let data = await prisma.users.findMany({
-        where: {
-          AND: [
-            body.filters,
-            {
-              OR: [
-                { user_id: { contains: body.query } },
-                { name: { contains: body.query } },
-                { phone_no: { contains: body.query } },
-                { email: { contains: body.query } }
-              ]
-            }
-          ]
-        }
+        where,
+        select: this.selectUser,
+        skip: query.page ? (parseInt(query.page) - 1) * pageSize : 0,
+        take: pageSize
       })
-      res.status(200).send({ message: "data fetched.", data })
+      res.status(200).send({ message: "data fetched.", data, totalPages: Math.floor((totalPages + pageSize - 1) / pageSize) })
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "No data found.", error });
