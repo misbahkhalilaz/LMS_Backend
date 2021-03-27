@@ -277,18 +277,26 @@ export default class AdminController {
     }
   }
 
-  public getStudentsBySection = async (
+  public getStudents = async (
     req: express.Request,
     res: express.Response
   ) => {
     try {
       let query: any = req.query;
-      let sectionId: any = req.query.sectionId;
       let pageSize: number = parseInt(query.pageSize) > 0 ? parseInt(query.pageSize) : 20;
-      let where = {
-        section_id: parseInt(sectionId),
-        isActive: req.query.isActive ? req.query.isActive === "true" : undefined
+
+      let where: any = {
+        role: 'student',
+        isActive: req.query.isActive ? req.query.isActive === "true" : undefined,
       };
+
+      where = query.programId ?
+        { ...where, sections: { batch: { program_id: parseInt(query.programId) } } }
+        : query.batchId ?
+          { ...where, sections: { batch_id: parseInt(query.batchId) } }
+          : query.sectionId ?
+            { ...where, section_id: parseInt(query.sectionId) }
+            : where;
 
       let totalPages: any = null;
       if (query.page === '1') {
@@ -310,7 +318,7 @@ export default class AdminController {
         skip: query.page ? (parseInt(query.page) - 1) * pageSize : 0,
         take: pageSize
       })
-      res.status(200).send({ message: "data fetched.", data, totalPages: Math.floor((totalPages + pageSize - 1) / pageSize) })
+      res.status(200).send({ message: "data fetched.", filters: where, data, totalPages: Math.floor((totalPages + pageSize - 1) / pageSize) })
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable get data from DB.", error });
