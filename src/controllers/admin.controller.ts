@@ -325,4 +325,32 @@ export default class AdminController {
     }
   }
 
+  public searchUsers = async (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      let body: any = req.body
+      let data = await prisma.users.findMany({
+        where: {
+          AND: [
+            body.filters,
+            {
+              OR: [
+                { user_id: { contains: body.query } },
+                { name: { contains: body.query } },
+                { phone_no: { contains: body.query } },
+                { email: { contains: body.query } }
+              ]
+            }
+          ]
+        }
+      })
+      res.status(200).send({ message: "data fetched.", data })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: "No data found.", error });
+    }
+  }
+
 }

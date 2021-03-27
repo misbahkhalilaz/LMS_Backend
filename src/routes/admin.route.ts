@@ -23,6 +23,7 @@ adminRouter.get("/getUsers", adminController.getUsers);
 adminRouter.post("/changeUserIsactive", adminController.changeUserIsactive)
 adminRouter.get("/getProgramsWithDetails", adminController.getProgramsWithDetails)
 adminRouter.get("/getStudents", adminController.getStudents)
+adminRouter.post("/searchUsers", adminController.searchUsers)
 
 
 export default adminRouter;
