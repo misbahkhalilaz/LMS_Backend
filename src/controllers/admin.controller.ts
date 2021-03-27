@@ -352,4 +352,24 @@ export default class AdminController {
     }
   }
 
+  public getCourses = (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      let { isActive, programId, semester }: any = req.query;
+      prisma.courses.findMany({
+        where: {
+          isActive: isActive ? isActive === "true" : undefined,
+          program_id: parseInt(programId),
+          semester: parseInt(semester)
+        }
+      })
+        .then(data => res.status(200).send({ message: 'data fetched.', data }))
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: "No data found.", error });
+    }
+  }
+
 }
