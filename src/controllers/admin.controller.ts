@@ -291,7 +291,9 @@ export default class AdminController {
           { ...where, sections: { batch_id: parseInt(query.batchId) } }
           : query.programId ?
             { ...where, sections: { batch: { program_id: parseInt(query.programId) } } }
-            : where;
+            : query.shift ?
+              { ...where, sections: { batch: { shift: query.shift } } }
+              : where;
 
       let totalPages: any = null;
       if (query.page === '1') {
