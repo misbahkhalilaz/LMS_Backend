@@ -156,20 +156,20 @@ export default class AdminController {
     }
   };
 
-  public createClass = (req: express.Request, res: express.Response) => {
+  public createClass = async (req: express.Request, res: express.Response) => {
     try {
       let data = {
         course_id: req.body.courseId,
         section_id: req.body.sectionId,
         teacher_id: req.body.teacherId,
       };
-      prisma.classes
-        .create({ data })
-        .then((status) => {
-          console.log(status);
-          res.status(200).send({ message: "class added.", data: status });
-        })
+      let status;
+      if (req.body.labTeacherId)
+        status = await prisma.classes.createMany({ data: [data, { ...data, teacher_id: req.body.labTeacherId, type: 'Lab' }] })
+      else
+        status = await prisma.classes.create({ data })
 
+      res.status(200).send({ message: "class added.", data: status });
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable to insert data in DB.", error });
