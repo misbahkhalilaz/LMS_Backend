@@ -285,12 +285,12 @@ export default class AdminController {
         isActive: req.query.isActive ? req.query.isActive === "true" : undefined,
       };
 
-      where = query.programId ?
-        { ...where, sections: { batch: { program_id: parseInt(query.programId) } } }
+      where = query.sectionId ?
+        { ...where, section_id: parseInt(query.sectionId) }
         : query.batchId ?
           { ...where, sections: { batch_id: parseInt(query.batchId) } }
-          : query.sectionId ?
-            { ...where, section_id: parseInt(query.sectionId) }
+          : query.programId ?
+            { ...where, sections: { batch: { program_id: parseInt(query.programId) } } }
             : where;
 
       let totalPages: any = null;
