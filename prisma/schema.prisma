@@ -70,6 +70,7 @@ model users {
 model classes {
   id         Int      @id @default(autoincrement())
   course_id  Int
+  type       String   @default("Theory") @db.VarChar(6)
   section_id Int
   teacher_id Int
   isActive   Boolean  @default(true)
@@ -77,5 +78,5 @@ model classes {
   sections   sections @relation(fields: [section_id], references: [id])
   users      users    @relation(fields: [teacher_id], references: [id])
 
-  @@unique([course_id, section_id, teacher_id], name: "classes_course_id_section_id_teacher_id_key")
+  @@unique([course_id, section_id, teacher_id, type], name: "classes_course_id_section_id_teacher_id_type_key")
 }
