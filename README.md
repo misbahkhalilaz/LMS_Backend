@@ -14,7 +14,7 @@ main branch will automatically be hosted (after merge or push) at: https://lms-f
 
 email: lms.fyp.devs@gmail.com  
 pass: ubit12345  
-heroku: ubit@12345
+heroku: ubit@12345  
 postman: login with google  
 dbdesigner: login with github  
 
