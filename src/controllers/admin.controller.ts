@@ -354,20 +354,24 @@ export default class AdminController {
     }
   }
 
-  public getCourses = (
+  public getCourses = async (
     req: express.Request,
     res: express.Response
   ) => {
     try {
-      let { isActive, programId, semester }: any = req.query;
-      prisma.courses.findMany({
-        where: {
-          isActive: isActive ? isActive === "true" : undefined,
-          program_id: parseInt(programId),
-          semester: parseInt(semester)
-        }
-      })
-        .then(data => res.status(200).send({ message: 'data fetched.', data }))
+      let { isActive, programId, semester, sectionId }: any = req.query;
+      let data;
+      let where = {
+        isActive: isActive ? isActive === "true" : undefined,
+        program_id: parseInt(programId),
+        semester: parseInt(semester)
+      }
+      if (sectionId) {
+        data = await prisma.courses.findMany({ where: { ...where, classes: { every: { section_id: { not: parseInt(sectionId) } } } } })
+      }
+      else
+        data = await prisma.courses.findMany({ where })
+      res.status(200).send({ message: 'data fetched.', data })
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "No data found.", error });
