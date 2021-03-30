@@ -363,8 +363,8 @@ export default class AdminController {
       let data;
       let where = {
         isActive: isActive ? isActive === "true" : undefined,
-        program_id: parseInt(programId),
-        semester: parseInt(semester)
+        program_id: programId ? parseInt(programId) : undefined,
+        semester: semester ? parseInt(semester) : undefined
       }
       if (sectionId) {
         data = await prisma.courses.findMany({ where: { ...where, classes: { every: { section_id: { not: parseInt(sectionId) } } } } })
