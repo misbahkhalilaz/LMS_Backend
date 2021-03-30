@@ -19,6 +19,7 @@ adminRouter.get("/getStudents", adminController.getStudents)
 adminRouter.post("/searchUsers", adminController.searchUsers)
 adminRouter.get("/getCourses", adminController.getCourses)
 adminRouter.post("/changeCourseIsActive", adminController.changeCourseIsActive)
+adminRouter.post("/createTimeTable", adminController.createTimeTable)
 
 
 export default adminRouter;

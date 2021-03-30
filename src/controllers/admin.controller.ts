@@ -1,7 +1,7 @@
 import * as express from "express";
 import fs from "fs";
 import xlsToJson from "convert-excel-to-json";
-import { User, Teacher, Program, Course } from "../interfaces/Admin";
+import { TimeTable, Teacher, Program, Course } from "../interfaces/Admin";
 
 export default class AdminController {
 
@@ -16,7 +16,7 @@ export default class AdminController {
     isActive: true,
   }
 
-  public createTeacherAccounts = (
+  public createTeacherAccounts = async (
     req: express.Request,
     res: express.Response
   ) => {
@@ -28,20 +28,17 @@ export default class AdminController {
         email: req.body.email,
         role: "teacher",
       };
-      prisma.users
-        .create({ data })
-        .then((status) =>
-          res
-            .status(200)
-            .send({ message: status.user_id + " added.", data: status })
-        )
+
+      let response = await prisma.users.create({ data })
+      res.status(200).send({ message: response.user_id + " added.", data: response })
+
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable to insert data in DB.", error });
     }
   };
 
-  public createProgram = (
+  public createProgram = async (
     req: express.Request,
     res: express.Response
   ) => {
@@ -51,13 +48,9 @@ export default class AdminController {
         no_of_years: req.body.noOfYears,
         max_enrol_years: req.body.maxEnrolYears,
       };
-      prisma.programs
-        .create({ data })
-        .then((status) =>
-          res
-            .status(200)
-            .send({ message: status.name + " added.", data: status })
-        )
+
+      let response = await prisma.programs.create({ data })
+      res.status(200).send({ message: response.name + " added.", data: response })
 
     } catch (error) {
       console.log(error);
@@ -65,7 +58,7 @@ export default class AdminController {
     }
   };
 
-  public createCourse = (req: express.Request, res: express.Response) => {
+  public createCourse = async (req: express.Request, res: express.Response) => {
     try {
       const data: Course = {
         program_id: req.body.programId,
@@ -75,13 +68,9 @@ export default class AdminController {
         semester: req.body.semester,
         total_marks: req.body.totalMarks,
       };
-      prisma.courses
-        .create({ data })
-        .then((status) =>
-          res
-            .status(200)
-            .send({ message: status.name + " added.", data: status })
-        )
+
+      let response = await prisma.courses.create({ data })
+      res.status(200).send({ message: response.name + " added.", data: response })
 
     } catch (error) {
       console.log(error);
@@ -127,7 +116,7 @@ export default class AdminController {
     return payload;
   };
 
-  public createBatch = (req: express.Request, res: express.Response) => {
+  public createBatch = async (req: express.Request, res: express.Response) => {
     try {
       let files: any = req.files;
       if (files.length >= 1) {
@@ -136,14 +125,9 @@ export default class AdminController {
         files.forEach((file: any) =>
           fs.unlink(file.path, () => console.log(file.path, "deleted"))
         );
-        prisma.batch
-          .create({ data, include: { sections: { include: { users: true } } } })
-          .then((status) => {
-            console.log(status);
-            res
-              .status(200)
-              .send({ message: status.name + " added.", data: status });
-          })
+
+        let response = await prisma.batch.create({ data, include: { sections: { include: { users: true } } } })
+        res.status(200).send({ message: response.name + " added.", data: response })
 
       } else {
         throw {
@@ -239,33 +223,50 @@ export default class AdminController {
     }
   };
 
-  public changeUserIsactive = (
+  public changeUserIsactive = async (
     req: express.Request,
     res: express.Response
   ) => {
     try {
-      prisma.users.update({
-        where: { id: req.body.id }, data: { isActive: req.body.isActive }, select: this.selectUser,
-
+      let response = await prisma.users.update({
+        where: {
+          id: req.body.id
+        },
+        data: {
+          isActive: req.body.isActive
+        },
+        select: this.selectUser,
       })
-        .then(status => res.status(200).send({ message: "User Updated", data: status }))
+      res.status(200).send({ message: "User Updated", data: response })
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable to update.", error });
     }
   };
 
-  public getProgramsWithDetails = (
+  public getProgramsWithDetails = async (
     req: express.Request,
     res: express.Response
   ) => {
     try {
-      prisma.programs.findMany({
-        where: { id: { gt: 1 } },
+      let response = await prisma.programs.findMany({
+        where: {
+          id: {
+            gt: 1
+          }
+        },
         include: {
-          batch: { where: { isActive: true }, include: { sections: true } }
+          batch: {
+            where: {
+              isActive: true
+            },
+            include: {
+              sections: true
+            }
+          }
         }
-      }).then(data => res.status(200).send({ message: "data fetched", data }))
+      })
+      res.status(200).send({ message: "data fetched", data: response })
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable get data from DB.", error });
@@ -378,19 +379,41 @@ export default class AdminController {
     }
   }
 
-  public changeCourseIsActive = (
+  public changeCourseIsActive = async (
     req: express.Request,
     res: express.Response
   ) => {
     try {
-      prisma.courses.update({
-        where: { id: req.body.id }, data: { isActive: req.body.isActive }
+      let response = await prisma.courses.update({
+        where: {
+          id: req.body.id
+        },
+        data: {
+          isActive: req.body.isActive
+        }
       })
-        .then(status => res.status(200).send({ message: "Course Updated", data: status }))
+      res.status(200).send({ message: "Course Updated", data: response })
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "unable to update.", error });
     }
   };
+
+  public createTimeTable = async (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      const data: Array<TimeTable> = req.body.map(
+        ({ classId, semester, shift, sectionId, day, teacherId, period, roomId }: any) =>
+          ({ class_id: classId, semester, shift, section_id: sectionId, teacher_id: teacherId, period, room_id: roomId, day }));
+
+      let response = await prisma.time_table.createMany({ data })
+      res.status(200).send({ message: "schedule added.", data: response })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: "unable to insert data in DB.", error });
+    }
+  }
 
 }
