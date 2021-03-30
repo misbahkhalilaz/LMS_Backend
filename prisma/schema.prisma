@@ -80,3 +80,8 @@ model classes {
 
   @@unique([course_id, section_id, teacher_id, type], name: "classes_course_id_section_id_teacher_id_type_key")
 }
+
+model rooms {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(5)
+}
