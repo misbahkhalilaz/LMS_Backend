@@ -378,4 +378,19 @@ export default class AdminController {
     }
   }
 
+  public changeCourseIsActive = (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      prisma.courses.update({
+        where: { id: req.body.id }, data: { isActive: req.body.isActive }
+      })
+        .then(status => res.status(200).send({ message: "Course Updated", data: status }))
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: "unable to update.", error });
+    }
+  };
+
 }

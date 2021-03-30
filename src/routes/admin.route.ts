@@ -18,6 +18,7 @@ adminRouter.get("/getProgramsWithDetails", adminController.getProgramsWithDetail
 adminRouter.get("/getStudents", adminController.getStudents)
 adminRouter.post("/searchUsers", adminController.searchUsers)
 adminRouter.get("/getCourses", adminController.getCourses)
+adminRouter.post("/changeCourseIsActive", adminController.changeCourseIsActive)
 
 
 export default adminRouter;
