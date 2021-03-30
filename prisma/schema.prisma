@@ -44,44 +44,72 @@ model programs {
 }
 
 model sections {
-  id       Int       @id @default(autoincrement())
-  name     String    @db.VarChar(50)
-  batch_id Int
-  batch    batch     @relation(fields: [batch_id], references: [id])
-  classes  classes[]
-  users    users[]
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(50)
+  batch_id   Int
+  batch      batch        @relation(fields: [batch_id], references: [id])
+  classes    classes[]
+  time_table time_table[]
+  users      users[]
 }
 
 model users {
-  id             Int       @id @default(autoincrement())
-  section_id     Int       @default(1)
-  user_id        String    @unique @db.VarChar(50)
-  password       String?   @db.VarChar(72)
-  role           String    @default("student") @db.VarChar(10)
-  name           String    @db.VarChar(30)
-  phone_no       String    @db.VarChar(11)
-  email          String?   @db.VarChar(50)
-  admission_year Decimal?  @db.Decimal(4, 0)
-  isActive       Boolean   @default(true)
-  sections       sections  @relation(fields: [section_id], references: [id])
+  id             Int          @id @default(autoincrement())
+  section_id     Int          @default(1)
+  user_id        String       @unique @db.VarChar(50)
+  password       String?      @db.VarChar(72)
+  role           String       @default("student") @db.VarChar(10)
+  name           String       @db.VarChar(30)
+  phone_no       String       @db.VarChar(11)
+  email          String?      @db.VarChar(50)
+  admission_year Decimal?     @db.Decimal(4, 0)
+  isActive       Boolean      @default(true)
+  sections       sections     @relation(fields: [section_id], references: [id])
   classes        classes[]
+  time_table     time_table[]
 }
 
 model classes {
-  id         Int      @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   course_id  Int
-  type       String   @default("Theory") @db.VarChar(6)
+  type       String       @default("Theory") @db.VarChar(6)
   section_id Int
   teacher_id Int
-  isActive   Boolean  @default(true)
-  courses    courses  @relation(fields: [course_id], references: [id])
-  sections   sections @relation(fields: [section_id], references: [id])
-  users      users    @relation(fields: [teacher_id], references: [id])
+  isActive   Boolean      @default(true)
+  courses    courses      @relation(fields: [course_id], references: [id])
+  sections   sections     @relation(fields: [section_id], references: [id])
+  users      users        @relation(fields: [teacher_id], references: [id])
+  time_table time_table[]
 
   @@unique([course_id, section_id, teacher_id, type], name: "classes_course_id_section_id_teacher_id_type_key")
 }
 
 model rooms {
-  id   Int    @id @default(autoincrement())
-  name String @db.VarChar(5)
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(5)
+  time_table time_table[]
+}
+
+model time_table {
+  id               Int          @id @default(autoincrement())
+  shift            String       @db.VarChar(7)
+  semester         Decimal      @db.Decimal(1, 0)
+  section_id       Int
+  class_id         Int
+  teacher_id       Int
+  day              Decimal      @db.Decimal(1, 0)
+  period           Decimal      @db.Decimal(1, 0)
+  room_id          Int
+  canceled         Boolean      @default(false)
+  replaced_with    Int?
+  isActive         Boolean      @default(true)
+  classes          classes      @relation(fields: [class_id], references: [id])
+  time_table       time_table?  @relation("time_tableTotime_table_replaced_with", fields: [replaced_with], references: [id])
+  rooms            rooms        @relation(fields: [room_id], references: [id])
+  sections         sections     @relation(fields: [section_id], references: [id])
+  users            users        @relation(fields: [teacher_id], references: [id])
+  other_time_table time_table[] @relation("time_tableTotime_table_replaced_with")
+
+  @@unique([room_id, day, period, shift], name: "time_table_room_id_day_period_shift_key")
+  @@unique([teacher_id, day, period, shift], name: "time_table_teacher_id_day_period_shift_key")
 }

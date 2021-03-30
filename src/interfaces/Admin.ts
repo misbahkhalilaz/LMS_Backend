@@ -23,3 +23,14 @@ export interface Course {
   credit_hr: number;
   total_marks: number;
 }
+
+export interface TimeTable {
+  shift: string;
+  semester: number;
+  section_id: number;
+  class_id: number;
+  teacher_id: number;
+  day: number;
+  period: number;
+  room_id: number
+}
