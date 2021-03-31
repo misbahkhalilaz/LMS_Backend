@@ -416,4 +416,26 @@ export default class AdminController {
     }
   }
 
+  public getClassesBySection = async (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      let { sectionId }: any = req.query;
+      let data: any = await prisma.classes.findMany({
+        where: {
+          section_id: parseInt(sectionId),
+          isActive: true
+        },
+        include: {
+          users: true
+        }
+      })
+      res.status(200).send({ message: "data fetched.", data })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: "No data found.", error });
+    }
+  }
+
 }
