@@ -428,7 +428,7 @@ export default class AdminController {
           isActive: true
         },
         include: {
-          users: true,
+          users: { select: this.selectUser },
           courses: true
         }
       })
