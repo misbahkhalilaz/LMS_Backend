@@ -428,7 +428,8 @@ export default class AdminController {
           isActive: true
         },
         include: {
-          users: true
+          users: true,
+          courses: true
         }
       })
       res.status(200).send({ message: "data fetched.", data })
