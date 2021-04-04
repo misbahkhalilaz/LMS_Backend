@@ -440,4 +440,80 @@ export default class AdminController {
     }
   }
 
+  public getAvailableRooms = async (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      interface Iroom {
+        id: number;
+        name: string
+      }
+      interface Iday {
+        period1: Array<Iroom>;
+        period2: Array<Iroom>;
+        period3?: Array<Iroom>
+      }
+
+      interface Ishift {
+        Monday: Array<Iday>;
+        Tuesday: Array<Iday>;
+        Wednesday: Array<Iday>;
+        Thursday: Array<Iday>;
+        Friday: Array<Iday>
+      }
+      let availableRooms =
+        [
+          [1, 2, 3], //Mon
+          [1, 2, 3], //Tue
+          [1, 2, 3], //wed
+          [1, 2, 3], //thu
+          [1, 2]     //fri
+        ]
+
+
+      const getRooms = (shift: string, day: number, period: number) => prisma.rooms.findMany({
+        where: {
+          time_table: {
+            none: {
+              AND: [
+                { isActive: true },
+                { shift },
+                { period },
+                { day }
+              ]
+            }
+          }
+        }
+      })
+
+      const data = {
+        Morning: await Promise.all(availableRooms.map(
+          (dayArr, dayI) =>
+            prisma.$transaction(dayArr.map(
+              period =>
+                getRooms("Morning", dayI + 1, period)
+            )
+            )
+        )
+        ),
+        Evening: await Promise.all(availableRooms.map(
+          (dayArr, dayI) =>
+            prisma.$transaction(dayArr.map(
+              period =>
+                getRooms("Evening", dayI + 1, period)
+            )
+            )
+        )
+        )
+      }
+
+      res.status(200).send({ message: "data fetched", data })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: "No data found.", error });
+
+    }
+
+  }
 }
