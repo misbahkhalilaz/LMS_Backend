@@ -421,10 +421,11 @@ export default class AdminController {
     res: express.Response
   ) => {
     try {
-      let { sectionId }: any = req.query;
+      let { sectionIds }: any = req.query;
+      sectionIds = sectionIds.split(',').map((id: any) => parseInt(id))
       let data: any = await prisma.classes.findMany({
         where: {
-          section_id: parseInt(sectionId),
+          section_id: { in: sectionIds },
           isActive: true
         },
         include: {
