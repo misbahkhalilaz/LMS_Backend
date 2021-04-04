@@ -445,23 +445,7 @@ export default class AdminController {
     res: express.Response
   ) => {
     try {
-      interface Iroom {
-        id: number;
-        name: string
-      }
-      interface Iday {
-        period1: Array<Iroom>;
-        period2: Array<Iroom>;
-        period3?: Array<Iroom>
-      }
-
-      interface Ishift {
-        Monday: Array<Iday>;
-        Tuesday: Array<Iday>;
-        Wednesday: Array<Iday>;
-        Thursday: Array<Iday>;
-        Friday: Array<Iday>
-      }
+      const { shift }: any = req.query
       let availableRooms =
         [
           [1, 2, 3], //Mon
@@ -470,7 +454,6 @@ export default class AdminController {
           [1, 2, 3], //thu
           [1, 2]     //fri
         ]
-
 
       const getRooms = (shift: string, day: number, period: number) => prisma.rooms.findMany({
         where: {
@@ -487,32 +470,28 @@ export default class AdminController {
         }
       })
 
-      const data = {
-        Morning: await Promise.all(availableRooms.map(
-          (dayArr, dayI) =>
-            prisma.$transaction(dayArr.map(
-              period =>
-                getRooms("Morning", dayI + 1, period)
-            )
-            )
-        )
-        ),
-        Evening: await Promise.all(availableRooms.map(
-          (dayArr, dayI) =>
-            prisma.$transaction(dayArr.map(
-              period =>
-                getRooms("Evening", dayI + 1, period)
-            )
-            )
-        )
-        )
-      }
+      let data: any = await Promise.all(availableRooms.map(
+        (dayArr, dayI) =>
+          prisma.$transaction(dayArr.map(
+            period =>
+              getRooms(shift, dayI + 1, period)
+          )
+          )
+      )
+      )
+
+      data = data.map(
+        (dayArr: any, dayI: any) => ({
+          [dayI + 1]: dayArr.map(
+            (periods: any, perriodI: any) => ({
+              [perriodI + 1]: periods
+            }))
+        }))
 
       res.status(200).send({ message: "data fetched", data })
     } catch (error) {
       console.log(error);
       res.status(500).send({ message: "No data found.", error });
-
     }
 
   }
