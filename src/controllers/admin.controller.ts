@@ -446,6 +446,10 @@ export default class AdminController {
   ) => {
     try {
       const { shift }: any = req.query
+      if (!['Morning', 'Evening'].includes(shift)) {
+        res.status(400).send({ message: "shift not found." });
+        return
+      }
       let availableRooms =
         [
           [1, 2, 3], //Mon
@@ -470,21 +474,27 @@ export default class AdminController {
         }
       })
 
-      let data: any = await Promise.all(availableRooms.map(
-        (dayArr, dayI) =>
-          prisma.$transaction(dayArr.map(
-            period =>
-              getRooms(shift, dayI + 1, period)
-          )
-          )
-      )
+      let data: any = await Promise.all(
+        availableRooms.map(
+          (dayArr, dayI) =>
+            prisma.$transaction(
+              dayArr.map(
+                period =>
+                  getRooms(shift, dayI + 1, period)
+              )
+            )
+        )
       )
 
       data = data.map(
         (dayArr: any, dayI: any) => ({
           [dayI + 1]: dayArr.map(
-            (periods: any, perriodI: any) => ({
-              [perriodI + 1]: periods
+            (periodsArr: any, perriodI: any) => ({
+              [perriodI + 1]: periodsArr.map(
+                (period: any) => ({
+                  value: period.id,
+                  label: period.name
+                }))
             }))
         }))
 
