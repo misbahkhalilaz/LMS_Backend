@@ -486,18 +486,6 @@ export default class AdminController {
         )
       )
 
-      data = data.map(
-        (dayArr: any, dayI: any) => ({
-          [dayI + 1]: dayArr.map(
-            (periodsArr: any, perriodI: any) => ({
-              [perriodI + 1]: periodsArr.map(
-                (period: any) => ({
-                  value: period.id,
-                  label: period.name
-                }))
-            }))
-        }))
-
       res.status(200).send({ message: "data fetched", data })
     } catch (error) {
       console.log(error);
