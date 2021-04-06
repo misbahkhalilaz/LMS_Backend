@@ -9,6 +9,7 @@ const uploader = new UploadFile(4, '*', 2 * 1024 * 1024);
 
 teacherRouter.get('/getClasses', teacherController.getClasses)
 teacherRouter.post("/createPost", uploader.upload.any(), teacherController.createPost);
+teacherRouter.get('/getPosts', teacherController.getPosts)
 
 
 
