@@ -38,4 +38,18 @@ export default class StudentController {
     }
   }
 
+  public getPosts = async (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      const { classId }: any = req.query
+      const data = await prisma.class_posts.findMany({ where: { class_id: parseInt(classId) } })
+      res.status(200).send({ message: "data fetched.", data })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: "unable to get data.", error });
+    }
+  }
+
 }
