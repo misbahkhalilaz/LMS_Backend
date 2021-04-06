@@ -31,7 +31,7 @@ export default class TeacherController {
         res: express.Response
     ) => {
         try {
-            const { files, body: { classId, title, isAssignment, description, deadline, totalMarks } }: any = req;
+            const { files, body: { classId, title, isAssignment, description, deadline, totalMarks, allowComments } }: any = req;
             const file_paths = files.map((file: any) => file.filename)
             let data = await prisma.class_posts.create({
                 data: {
@@ -41,13 +41,27 @@ export default class TeacherController {
                     deadline,
                     total_marks: parseInt(totalMarks),
                     file_paths,
-                    isAssignment: isAssignment === 'true'
+                    isAssignment: isAssignment === 'true',
+                    allow_comments: allowComments === 'true'
                 }
             })
             res.status(200).send({ message: 'data stored successfully', data })
         } catch (error) {
             console.log(error);
             res.status(500).send({ message: "unable to insert data in DB.", error });
+        }
+    }
+
+    public getPosts = async (
+        req: express.Request,
+        res: express.Response
+    ) => {
+        try {
+            const { classId }: any = req.query
+            const data = prisma.class_posts.findMany({ where: { class_id: parseInt(classId) } })
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({ message: "unable to get data.", error });
         }
     }
 
