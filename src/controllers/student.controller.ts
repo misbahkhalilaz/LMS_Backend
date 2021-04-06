@@ -1,6 +1,6 @@
 import * as express from "express";
 
-export default class TeacherController {
+export default class StudentController {
 
     public getClasses = async (
         req: express.Request,
@@ -9,13 +9,13 @@ export default class TeacherController {
         try {
             const data = await prisma.classes.findMany({
                 where: {
-                    teacher_id: req.body.tokenData.id,
+                    sections: {users: req.body.tokenData.id},
                     isActive: true
                 },
                 include: {
                     courses: true,
                     time_table: true,
-                    sections: {include: {batch: true}}
+                    users: true
                 }
             })
             res.status(200).send({ message: "data fetched.", data })
