@@ -8,20 +8,22 @@ export default class StudentController {
     ) => {
         try {
             const data = await prisma.classes.findMany({
-                where: {
-                    sections: {users: req.body.tokenData.id},
-                    isActive: true
-                },
-                include: {
-                    courses: true,
-                    time_table: true,
-                    users: true
-                }
-            })
+              where: {
+                sections: { users: { every: { id: req.body.tokenData.id } } },
+                courses: { isActive: true },
+                users: {isActive: true},
+                isActive: true,
+              },
+              include: {
+                courses: true,
+                time_table: true,
+                users: true,
+              },
+            });
             res.status(200).send({ message: "data fetched.", data })
         } catch (error) {
             console.log(error);
-            res.status(500).send({ message: "unable to insert data in DB.", error });
+            res.status(500).send({ message: "unable to get data.", error });
         }
     }
 
