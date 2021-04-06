@@ -70,16 +70,17 @@ model users {
 }
 
 model classes {
-  id         Int          @id @default(autoincrement())
-  course_id  Int
-  type       String       @default("Theory") @db.VarChar(6)
-  section_id Int
-  teacher_id Int
-  isActive   Boolean      @default(true)
-  courses    courses      @relation(fields: [course_id], references: [id])
-  sections   sections     @relation(fields: [section_id], references: [id])
-  users      users        @relation(fields: [teacher_id], references: [id])
-  time_table time_table[]
+  id          Int           @id @default(autoincrement())
+  course_id   Int
+  type        String        @default("Theory") @db.VarChar(6)
+  section_id  Int
+  teacher_id  Int
+  isActive    Boolean       @default(true)
+  courses     courses       @relation(fields: [course_id], references: [id])
+  sections    sections      @relation(fields: [section_id], references: [id])
+  users       users         @relation(fields: [teacher_id], references: [id])
+  class_posts class_posts[]
+  time_table  time_table[]
 
   @@unique([course_id, section_id, teacher_id, type], name: "classes_course_id_section_id_teacher_id_type_key")
 }
@@ -112,4 +113,18 @@ model time_table {
 
   @@unique([room_id, day, period, shift], name: "time_table_room_id_day_period_shift_key")
   @@unique([teacher_id, day, period, shift], name: "time_table_teacher_id_day_period_shift_key")
+}
+
+model class_posts {
+  id             Int       @id @default(autoincrement())
+  class_id       Int
+  date           DateTime  @default(now()) @db.Timestamp(6)
+  title          String    @db.VarChar(100)
+  description    String
+  file_paths     String[]
+  allow_comments Boolean   @default(true)
+  isAssignment   Boolean   @default(false)
+  deadline       DateTime? @db.Timestamp(6)
+  total_marks    Int
+  classes        classes   @relation(fields: [class_id], references: [id])
 }

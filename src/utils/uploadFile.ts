@@ -8,7 +8,7 @@ export default class UploadFile {
 
   constructor(
     no_of_files: number = 1,
-    extensions: Array<string> = [".xls", ".xlsx"],
+    extensions: Array<string> | string = [".xls", ".xlsx"],
     fileSize: number = 1024 * 1024,
     dest: string = "storage/"
   ) {
@@ -21,15 +21,15 @@ export default class UploadFile {
         cb(
           null,
           file.fieldname +
-            "-" +
-            Date.now() +
-            path.extname(file.originalname) +
-            ".temp"
+          "-" +
+          Date.now() +
+          path.extname(file.originalname) +
+          ".temp"
         );
       },
     });
     this.fileFilter = function (req: any, file: any, cb: any) {
-      if (!extensions.includes(path.extname(file.originalname))) {
+      if (extensions !== '*' && !extensions.includes(path.extname(file.originalname))) {
         return cb(
           new Error(
             `${path.extname(
