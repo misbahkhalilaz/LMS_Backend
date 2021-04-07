@@ -108,11 +108,33 @@ export default class TeacherController {
         res: express.Response
     ) => {
         try {
-            let data = await prisma.time_table.findMany({ where: { isActive: true, teacher_id: req.body.tokenData.id }, include: { time_table: true } })
+            let data = await prisma.time_table.findMany({
+                where: {
+                    isActive: true,
+                    teacher_id: req.body.tokenData.id
+                },
+                include: {
+                    time_table: true
+                }
+            })
             res.status(200).send({ message: "data fetched.", data })
         } catch (error) {
             console.log(error);
             res.status(500).send({ message: "unable to get data.", error });
+        }
+    }
+
+    public markAttendance = async (
+        req: express.Request,
+        res: express.Response
+    ) => {
+        try {
+            const { studentId, classId }: any = req.body;
+            const data = await prisma.class_attendance.create({ data: { class_id: parseInt(classId), student_id: parseInt(studentId) } })
+            res.status(200).send({ message: "data inserted.", data })
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({ message: "unable insert data.", error });
         }
     }
 

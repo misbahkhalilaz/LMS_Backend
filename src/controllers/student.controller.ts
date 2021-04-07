@@ -52,4 +52,31 @@ export default class StudentController {
     }
   }
 
+  public getTimeTable = async (       //test this
+    req: express.Request,
+    res: express.Response
+  ) => {
+    try {
+      let data = await prisma.time_table.findMany({
+        where: {
+          isActive: true,
+          sections: {
+            users: {
+              some: {
+                id: req.body.tokenData.id
+              }
+            }
+          }
+        },
+        include: {
+          time_table: true
+        }
+      })
+      res.status(200).send({ message: "data fetched.", data })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: "unable to get data.", error });
+    }
+  }
+
 }

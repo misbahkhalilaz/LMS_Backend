@@ -54,33 +54,35 @@ model sections {
 }
 
 model users {
-  id             Int          @id @default(autoincrement())
-  section_id     Int          @default(1)
-  user_id        String       @unique @db.VarChar(50)
-  password       String?      @db.VarChar(72)
-  role           String       @default("student") @db.VarChar(10)
-  name           String       @db.VarChar(30)
-  phone_no       String       @db.VarChar(11)
-  email          String?      @db.VarChar(50)
-  admission_year Decimal?     @db.Decimal(4, 0)
-  isActive       Boolean      @default(true)
-  sections       sections     @relation(fields: [section_id], references: [id])
-  classes        classes[]
-  time_table     time_table[]
+  id               Int                @id @default(autoincrement())
+  section_id       Int                @default(1)
+  user_id          String             @unique @db.VarChar(50)
+  password         String?            @db.VarChar(72)
+  role             String             @default("student") @db.VarChar(10)
+  name             String             @db.VarChar(30)
+  phone_no         String             @db.VarChar(11)
+  email            String?            @db.VarChar(50)
+  admission_year   Decimal?           @db.Decimal(4, 0)
+  isActive         Boolean            @default(true)
+  sections         sections           @relation(fields: [section_id], references: [id])
+  class_attendance class_attendance[]
+  classes          classes[]
+  time_table       time_table[]
 }
 
 model classes {
-  id          Int           @id @default(autoincrement())
-  course_id   Int
-  type        String        @default("Theory") @db.VarChar(6)
-  section_id  Int
-  teacher_id  Int
-  isActive    Boolean       @default(true)
-  courses     courses       @relation(fields: [course_id], references: [id])
-  sections    sections      @relation(fields: [section_id], references: [id])
-  users       users         @relation(fields: [teacher_id], references: [id])
-  class_posts class_posts[]
-  time_table  time_table[]
+  id               Int                @id @default(autoincrement())
+  course_id        Int
+  type             String             @default("Theory") @db.VarChar(6)
+  section_id       Int
+  teacher_id       Int
+  isActive         Boolean            @default(true)
+  courses          courses            @relation(fields: [course_id], references: [id])
+  sections         sections           @relation(fields: [section_id], references: [id])
+  users            users              @relation(fields: [teacher_id], references: [id])
+  class_attendance class_attendance[]
+  class_posts      class_posts[]
+  time_table       time_table[]
 
   @@unique([course_id, section_id, teacher_id, type], name: "classes_course_id_section_id_teacher_id_type_key")
 }
@@ -127,4 +129,13 @@ model class_posts {
   deadline       DateTime? @db.Timestamp(6)
   total_marks    Int
   classes        classes   @relation(fields: [class_id], references: [id])
+}
+
+model class_attendance {
+  id         Int      @id @default(autoincrement())
+  date       DateTime @default(now()) @db.Timestamp(6)
+  class_id   Int
+  student_id Int
+  classes    classes  @relation(fields: [class_id], references: [id])
+  users      users    @relation(fields: [student_id], references: [id])
 }

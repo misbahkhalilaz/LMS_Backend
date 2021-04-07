@@ -12,6 +12,7 @@ teacherRouter.post("/createPost", uploader.upload.any(), teacherController.creat
 teacherRouter.get('/getPosts', teacherController.getPosts)
 teacherRouter.get('/getClassStudents', teacherController.getClassStudents)
 teacherRouter.get('/getTimeTable', teacherController.getTimeTable);
+teacherRouter.get('/markAttendance', teacherController.markAttendance);
 
 
 
