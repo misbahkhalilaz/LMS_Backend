@@ -2,6 +2,17 @@ import * as express from "express";
 
 export default class TeacherController {
 
+    private selectUser = {
+        id: true,
+        user_id: true,
+        name: true,
+        phone_no: true,
+        email: true,
+        role: true,
+        admission_year: true,
+        isActive: true,
+    }
+
     public getClasses = async (
         req: express.Request,
         res: express.Response
@@ -59,6 +70,32 @@ export default class TeacherController {
         try {
             const { classId }: any = req.query
             const data = await prisma.class_posts.findMany({ where: { class_id: parseInt(classId) } })
+            res.status(200).send({ message: "data fetched.", data })
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({ message: "unable to get data.", error });
+        }
+    }
+
+    public getClassStudents = async (
+        req: express.Request,
+        res: express.Response
+    ) => {
+        try {
+            const { classId }: any = req.query
+            const data = await prisma.users.findMany({
+                where: {
+                    role: 'student',
+                    isActive: true,
+                    sections: {
+                        classes: {
+                            every: {
+                                id: parseInt(classId)
+                            }
+                        }
+                    }
+                }, select: this.selectUser
+            })
             res.status(200).send({ message: "data fetched.", data })
         } catch (error) {
             console.log(error);
