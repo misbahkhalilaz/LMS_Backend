@@ -6,6 +6,7 @@ const studentController = new StudentController;
 
 studentRouter.get("/getClasses", studentController.getClasses);
 studentRouter.get('/getPosts', studentController.getPosts)
+studentRouter.get('/getTimeTable', studentController.getTimeTable)
 
 
 
