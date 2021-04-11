@@ -129,9 +129,32 @@ export default class TeacherController {
         res: express.Response
     ) => {
         try {
-            const { studentId, classId }: any = req.body;
-            const data = await prisma.class_attendance.create({ data: { class_id: parseInt(classId), student_id: parseInt(studentId) } })
-            res.status(200).send({ message: "data inserted.", data })
+            const { studentId, classId, isPresent }: any = req.body;
+            if (isPresent) {
+                const data = await prisma.class_attendance.create({
+                    data: {
+                        class_id: classId,
+                        student_id: studentId
+                    },
+                    include: {
+                        users: {
+                            select: this.selectUser
+                        }
+                    }
+                })
+                res.status(200).send({ message: `${data.users.name} marked present.`, data })
+            } else {
+                const data = await prisma.class_attendance.deleteMany({
+                    where: {
+                        class_id: classId,
+                        student_id: studentId,
+                        date: {
+                            gt: new Date(Date.now() - 15 * 60 * 1000).toISOString()     //get time 15min before from now
+                        }
+                    }
+                })
+                res.status(200).send({ message: `${data.count} absent marked`, data })
+            }
         } catch (error) {
             console.log(error);
             res.status(500).send({ message: "unable insert data.", error });
