@@ -52,7 +52,7 @@ export default class StudentController {
     }
   }
 
-  public getTimeTable = async (       //test this
+  public getTimeTable = async (
     req: express.Request,
     res: express.Response
   ) => {
