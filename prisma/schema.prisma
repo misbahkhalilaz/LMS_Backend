@@ -94,24 +94,25 @@ model rooms {
 }
 
 model time_table {
-  id               Int          @id @default(autoincrement())
-  shift            String       @db.VarChar(7)
-  semester         Decimal      @db.Decimal(1, 0)
+  id               Int                @id @default(autoincrement())
+  shift            String             @db.VarChar(7)
+  semester         Decimal            @db.Decimal(1, 0)
   section_id       Int
   class_id         Int
   teacher_id       Int
-  day              Decimal      @db.Decimal(1, 0)
-  period           Decimal      @db.Decimal(1, 0)
+  day              Decimal            @db.Decimal(1, 0)
+  period           Decimal            @db.Decimal(1, 0)
   room_id          Int
-  canceled         Boolean      @default(false)
+  canceled         Boolean            @default(false)
   replaced_with    Int?
-  isActive         Boolean      @default(true)
-  classes          classes      @relation(fields: [class_id], references: [id])
-  time_table       time_table?  @relation("time_tableTotime_table_replaced_with", fields: [replaced_with], references: [id])
-  rooms            rooms        @relation(fields: [room_id], references: [id])
-  sections         sections     @relation(fields: [section_id], references: [id])
-  users            users        @relation(fields: [teacher_id], references: [id])
-  other_time_table time_table[] @relation("time_tableTotime_table_replaced_with")
+  isActive         Boolean            @default(true)
+  classes          classes            @relation(fields: [class_id], references: [id])
+  time_table       time_table?        @relation("time_tableTotime_table_replaced_with", fields: [replaced_with], references: [id])
+  rooms            rooms              @relation(fields: [room_id], references: [id])
+  sections         sections           @relation(fields: [section_id], references: [id])
+  users            users              @relation(fields: [teacher_id], references: [id])
+  class_attendance class_attendance[]
+  other_time_table time_table[]       @relation("time_tableTotime_table_replaced_with")
 
   @@unique([room_id, day, period, shift], name: "time_table_room_id_day_period_shift_key")
   @@unique([teacher_id, day, period, shift], name: "time_table_teacher_id_day_period_shift_key")
@@ -120,22 +121,24 @@ model time_table {
 model class_posts {
   id             Int       @id @default(autoincrement())
   class_id       Int
-  date           DateTime  @default(now()) @db.Timestamp(6)
+  date           DateTime  @default(now()) @db.Timestamptz(6)
   title          String    @db.VarChar(100)
   description    String
   file_paths     String[]
   allow_comments Boolean   @default(true)
   isAssignment   Boolean   @default(false)
-  deadline       DateTime? @db.Timestamp(6)
+  deadline       DateTime? @db.Timestamptz(6)
   total_marks    Int
   classes        classes   @relation(fields: [class_id], references: [id])
 }
 
 model class_attendance {
-  id         Int      @id @default(autoincrement())
-  date       DateTime @default(now()) @db.Timestamp(6)
-  class_id   Int
-  student_id Int
-  classes    classes  @relation(fields: [class_id], references: [id])
-  users      users    @relation(fields: [student_id], references: [id])
+  id          Int        @id @default(autoincrement())
+  date        DateTime   @default(now()) @db.Timestamptz(6)
+  class_id    Int
+  student_id  Int
+  schedule_id Int
+  classes     classes    @relation(fields: [class_id], references: [id])
+  time_table  time_table @relation(fields: [schedule_id], references: [id])
+  users       users      @relation(fields: [student_id], references: [id])
 }
