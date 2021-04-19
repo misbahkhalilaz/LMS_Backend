@@ -7,13 +7,13 @@ const teacherController = new TeacherController;
 const uploader = new UploadFile(4, '*', 2 * 1024 * 1024);
 
 
-teacherRouter.get('/getClasses', teacherController.getClasses)
+teacherRouter.get('/getClasses', teacherController.getClasses);
 teacherRouter.post("/createPost", uploader.upload.any(), teacherController.createPost);
-teacherRouter.get('/getPosts', teacherController.getPosts)
-teacherRouter.get('/getClassStudents', teacherController.getClassStudents)
+teacherRouter.get('/getPosts', teacherController.getPosts);
+teacherRouter.get('/getClassStudents', teacherController.getClassStudents);
 teacherRouter.get('/getTimeTable', teacherController.getTimeTable);
-teacherRouter.get('/markAttendance', teacherController.markAttendance);
-
+teacherRouter.post('/markAttendance', teacherController.markAttendance);
+teacherRouter.get('/getTodaysAttendance', teacherController.getTodaysAttendance);
 
 
 export default teacherRouter;

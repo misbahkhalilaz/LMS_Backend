@@ -129,35 +129,76 @@ export default class TeacherController {
         res: express.Response
     ) => {
         try {
-            const { studentId, classId, isPresent }: any = req.body;
+            const { studentId, classId, scheduleId, isPresent }: any = req.body;
             if (isPresent) {
                 const data = await prisma.class_attendance.create({
-                    data: {
-                        class_id: classId,
-                        student_id: studentId
+                  data: {
+                    class_id: classId,
+                    student_id: studentId,
+                    schedule_id: scheduleId,
+                  },
+                  include: {
+                    users: {
+                      select: this.selectUser,
                     },
-                    include: {
-                        users: {
-                            select: this.selectUser
-                        }
-                    }
-                })
+                  },
+                });
                 res.status(200).send({ message: `${data.users.name} marked present.`, data })
             } else {
                 const data = await prisma.class_attendance.deleteMany({
-                    where: {
-                        class_id: classId,
-                        student_id: studentId,
-                        date: {
-                            gt: new Date(Date.now() - 15 * 60 * 1000).toISOString()     //get time 15min before from now
-                        }
-                    }
-                })
+                  where: {
+                    class_id: classId,
+                    student_id: studentId,
+                    schedule_id: scheduleId,
+                    date: {
+                      gt: new Date(
+                        new Date().setUTCHours(0, 0, 0, 0)
+                      ).toISOString(),
+                    },
+                  },
+                });
                 res.status(200).send({ message: `${data.count} absent marked`, data })
             }
         } catch (error) {
             console.log(error);
             res.status(500).send({ message: "unable insert data.", error });
+        }
+    }
+
+    public getTodaysAttendance = async (
+        req: express.Request,
+        res: express.Response
+    ) => {
+        try {
+            const { classId, scheduleId }: any = req.query;
+            let data = await prisma.class_attendance.findMany({
+              where: {
+                class_id: parseInt(classId),
+                date: {
+                  gt: new Date(
+                    new Date().setUTCHours(0, 0, 0, 0)
+                  ).toISOString(),
+                },
+                users: {
+                  isActive: true,
+                },
+                time_table: {
+                  id: parseInt(scheduleId)
+                    ? parseInt(scheduleId)
+                    : undefined,
+                },
+              },
+              include: {
+                users: {
+                  select: this.selectUser,
+                },
+                time_table: true,
+              },
+            });
+          res.status(200).send({ message: "data fetched.", data });
+        } catch (error) {
+          console.log(error);
+          res.status(500).send({ message: "unable get data.", error });
         }
     }
 
