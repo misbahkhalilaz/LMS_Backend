@@ -4,7 +4,7 @@
   "description": "The project belongs to the learing management system in which student of the department of computer science can benefit online classes due to COVID-19",
   "main": "server.ts",
   "scripts": {
-    "start": "pm2 start build/server.js -i max -r dotenv/config",
+    "start": "node -r dotenv/config build/server.js",
     "dev": "nodemon -r dotenv/config src/server.ts",
     "build": "tsc",
     "prisma": "prisma introspect && prisma generate"
@@ -40,8 +40,7 @@
     "multer": "^1.4.2",
     "nodemailer": "^6.5.0",
     "pg": "^8.5.1",
-    "pg-hstore": "^2.3.3",
-    "pm2": "^4.5.6"
+    "pg-hstore": "^2.3.3"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
